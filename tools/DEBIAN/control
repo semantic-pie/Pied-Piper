@@ -1,0 +1,12 @@
+Package: kbe
+Version: 0.3.2
+Section: science
+Priority: optional
+Architecture: amd64
+Installed-Size: 2064
+Depends: libc6 (>= 2.3), libgcc1 (>= 1:4.1.1), libqt5xml5, libqt5core5, libqt5gui5, libqt5concurrent5, libqt5widgets5
+Maintainer: Nikita Grishko <grin.minsk@gmail.com>
+Homepage: https://github.com/deniskoronchik/kbe
+Description: KBE - Knowledge Base source Editor.
+ This is a specialized tool that allow to create knowledge bases for intelligent systems based on OSTIS technology.
+ It include such extensions as SCg-code editor (graphical editor of semantic networks), scs editor (string representation of semantic networks)

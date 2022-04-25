@@ -1,0 +1,40 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% HEADER
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[a4paper,oneside, titlepage, 12pt]{article}
+\usepackage{fancyhdr} %%Fancy headings
+
+\usepackage[utf8]{inputenc}
+%% Language %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[USenglish, russian]{babel}
+\usepackage[T2A]{fontenc}
+\usepackage{float}
+
+
+\usepackage{graphicx} %%For loading graphic files
+%\usepackage{longtable} %%For tables, that exceed one page
+%% Other Packages %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{a4wide} %%Smaller margins = more text per page.
+\usepackage{color}
+\usepackage{colortbl}
+\usepackage[pdftex, unicode, colorlinks, linkcolor=black, urlcolor=blue]{hyperref}
+
+\begin{document}
+\uchyph=0
+\hfuzz=1pt
+
+\input{title}
+\pagestyle{empty}
+\tableofcontents
+\newpage
+\input{headings}
+
+\input{intro}
+\input{install}
+\input{gui}
+\input{usage}
+\input{support}
+\input{hotkeys}
+
+\end{document}
+
