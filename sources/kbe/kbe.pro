@@ -6,6 +6,7 @@ DESTDIR = ../bin
 
 QT      += xml widgets
 
+CONFIG += app_bundle
 ICON = kbe.icns
 TEMPLATE = app
 

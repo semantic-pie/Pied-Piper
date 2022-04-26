@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
     // Disable text scaling https://www.charlesodale.com/setting-qt-to-ignore-windows-dpi-text-size-personalization/
     QApplication::setAttribute(Qt::AA_Use96Dpi);
 
-    a.setOrganizationName("OSTIS_VM_edition");
+    a.setOrganizationName("Pied Piper");
     a.setOrganizationDomain("Mcorp");
     a.setApplicationName("Pied Piper");
 
@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 
     /* Set working directory */
 #ifdef Q_OS_MAC
-    binPath.cdUp();    /* Fix this on Mac because of the .app folder, */
+    binPath.cdUp();    /* Fix for Mac because of the .app folder, */
     binPath.cdUp();    /* which means that the actual executable is   */
     binPath.cdUp();    /* three levels deep. Grrr.                    */
 #endif

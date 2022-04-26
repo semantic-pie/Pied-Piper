@@ -33,7 +33,7 @@
 
 #include "scgplugin.h"
 #include "scgexportimage.h"
-
+#include "BluePrints.h"
 #include "scgfindwidget.h"
 #include "scgview.h"
 #include "scgminimap.h"
@@ -270,7 +270,15 @@ void SCgWindow::createToolBar()
 
     //
     mToolBar->addSeparator();
-    //
+
+    //BluePrint button
+    action = new QAction(findIcon("tool-blueprint.png"), tr("BluePrints"), mToolBar);
+    action->setCheckable(false);
+    action->setShortcut(QKeySequence(tr("0", "BluePrints")));
+    mToolBar->addAction(action);
+    connect(action, SIGNAL(triggered()), this, SLOT(onBluePrint()));
+    mToolBar->addSeparator();
+
     //Zoom in
     action = new QAction(findIcon("tool-zoom-in.png"), tr("Zoom in"), mToolBar);
     action->setCheckable(false);

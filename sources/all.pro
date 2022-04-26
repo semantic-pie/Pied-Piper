@@ -1,7 +1,6 @@
 
 QT       += core
 
-ICON =
 TEMPLATE = subdirs
 
 CONFIG += ordered
