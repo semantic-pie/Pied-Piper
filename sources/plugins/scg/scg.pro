@@ -1,8 +1,8 @@
 QT += xml widgets concurrent
-
+QT += core5compat
 TARGET        = $$qtLibraryTarget(scg)
 TEMPLATE      = lib
-INCLUDEPATH  += ../../kbe \
+INCLUDEPATH  += ../../PiedPiper \
                 ./
 
 DESTDIR = ../../bin/plugins
