@@ -80,6 +80,8 @@ SCgWindow::SCgWindow(const QString& _windowTitle, QWidget *parent)
     mView->setScene(mScene);
     mView->setSceneRect(0, 0, 1000, 1000);
 
+    mView->setStyleSheet("background-color: white;");
+
     mFindWidget = new SCgFindWidget(this);
     connect(mFindWidget, SIGNAL(findNext()), this, SLOT(findNext()));
     connect(mFindWidget, SIGNAL(findPrevious()), this, SLOT(findPrevious()));
@@ -606,8 +608,8 @@ void SCgWindow::activate(QMainWindow *window)
     EditorInterface::activate(window);
 
     createMenu();
-    QList<QAction*> allMenus = window->menuBar()->actions();
-    window->menuBar()->insertMenu(allMenus.at(1), mEditMenu);
+    //QList<QAction*> allMenus = window->menuBar()->actions();
+    //window->menuBar()->insertMenu(allMenus.at(1), mEditMenu);
 
     QToolBar *tool_bar = toolBar();
     if (tool_bar != 0)
