@@ -9,7 +9,7 @@ macx: {
 CONFIG += app_bundle
 ICON = PiedPiper.icns
 }
-
+TEMPLATE = app
 SOURCES += \
     mainwindow.cpp \
     main.cpp \
