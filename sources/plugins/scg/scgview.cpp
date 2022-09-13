@@ -352,26 +352,6 @@ void SCgView::mouseReleaseEvent (QMouseEvent * event)
 }
 
 
-void SCgView::dragEnterEvent(QDragEnterEvent *evt)
-{
-    evt->acceptProposedAction();
-}
-
-void SCgView::dragLeaveEvent(QDragLeaveEvent *evt)
-{
-    evt->accept();
-}
-
-void SCgView::dragMoveEvent(QDragMoveEvent *evt)
-{
-    evt->acceptProposedAction();
-}
-
-void SCgView::dropEvent(QDropEvent *event)
-{
-    QGraphicsView::dropEvent(event);
-    event->acceptProposedAction();
-}
 
 void SCgView::wheelEvent(QWheelEvent *event)
 {

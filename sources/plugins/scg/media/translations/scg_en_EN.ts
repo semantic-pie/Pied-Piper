@@ -394,11 +394,6 @@ Just 1.6 and 2.0 versions supported.</source>
     </message>
     <message>
         <location filename="../../scgtypedialog.cpp" line="25"/>
-        <source>Meta</source>
-        <translation>Meta</translation>
-    </message>
-    <message>
-        <location filename="../../scgtypedialog.cpp" line="27"/>
         <source>Constancy unknown</source>
         <translation></translation>
     </message>

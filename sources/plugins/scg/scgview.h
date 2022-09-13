@@ -37,12 +37,6 @@ protected:
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
 
-    /*! Drag and drop events
-      */
-    void dragEnterEvent(QDragEnterEvent *evt);
-    void dragLeaveEvent(QDragLeaveEvent *evt);
-    void dragMoveEvent(QDragMoveEvent *evt);
-    void dropEvent(QDropEvent *event);
 
     void wheelEvent(QWheelEvent *event);
 
