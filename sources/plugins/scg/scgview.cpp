@@ -95,7 +95,7 @@ void SCgView::createActions()
     connect(mActionHideAllContent, SIGNAL(triggered(bool)), this, SLOT(setContentVisible(bool)));
 
     mActionDeleteContent = new QAction(mWindow->findIcon("edit-content-delete.png"), tr("Delete content"), mWindow);
-    mActionDeleteContent->setShortcut(QKeySequence( tr("D") ));
+    mActionDeleteContent->setShortcut(QKeySequence( tr("delete") ));
     mWindow->addAction(mActionDeleteContent);
     connect(mActionDeleteContent, SIGNAL(triggered()), this, SLOT(deleteContent()));
 
@@ -110,7 +110,7 @@ void SCgView::createActions()
     connect(mActionDelete, SIGNAL(triggered()), this, SLOT(deleteSelected()));
 
     mActionContourDelete = new QAction(mWindow->findIcon("edit-delete.png"), tr("Delete contour"), mWindow);
-    mActionContourDelete->setShortcut( QKeySequence(tr("Backspace")) );
+    mActionContourDelete->setShortcut( QKeySequence(tr("delete")) );
     mWindow->addAction(mActionContourDelete);
     connect(mActionContourDelete, SIGNAL(triggered()), this, SLOT(deleteJustContour()));
 
