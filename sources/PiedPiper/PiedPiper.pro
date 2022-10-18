@@ -5,11 +5,11 @@
 DESTDIR = ../bin
 
 QT      += xml widgets
-
+macx: {
 CONFIG += app_bundle
-ICON = kbe.icns
+ICON = PiedPiper.icns
+}
 TEMPLATE = app
-
 SOURCES += \
     mainwindow.cpp \
     main.cpp \

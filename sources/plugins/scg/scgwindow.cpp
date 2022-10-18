@@ -5,7 +5,6 @@
  */
 
 #include "scgwindow.h"
-
 #include <QToolBar>
 #include <QApplication>
 #include <QClipboard>
@@ -21,7 +20,6 @@
 #include <QMenu>
 #include <QToolButton>
 #include <QFileDialog>
-
 #include "scglayoutmanager.h"
 #include "arrangers/scgarrangervertical.h"
 #include "arrangers/scgarrangerhorizontal.h"
@@ -78,6 +76,10 @@ SCgWindow::SCgWindow(const QString& _windowTitle, QWidget *parent)
     mView = new SCgView(0, this);
     mScene = new SCgScene(mUndoStack, mView);
     mView->setScene(mScene);
+
+    QPalette darkPalette;
+    darkPalette.setColor(QPalette::Base, QColor(250, 250, 250));
+    mView->setPalette(darkPalette);
     mView->setSceneRect(0, 0, 1000, 1000);
 
     mFindWidget = new SCgFindWidget(this);
@@ -146,7 +148,6 @@ void SCgWindow::createWidgetsForDocks()
     mMinimap = new SCgMinimap(mView, mView->viewport());
     mMinimap->setWindowTitle(tr("Mini map"));
     mMinimap->setObjectName("Mini map");
-
     mUndoView = new SCgUndoView(this);
     mUndoView->setStack(mUndoStack);
     mUndoView->setWindowTitle(tr("History"));
@@ -606,8 +607,8 @@ void SCgWindow::activate(QMainWindow *window)
     EditorInterface::activate(window);
 
     createMenu();
-    QList<QAction*> allMenus = window->menuBar()->actions();
-    window->menuBar()->insertMenu(allMenus.at(1), mEditMenu);
+    //QList<QAction*> allMenus = window->menuBar()->actions();
+    //window->menuBar()->insertMenu(allMenus.at(1), mEditMenu);
 
     QToolBar *tool_bar = toolBar();
     if (tool_bar != 0)

@@ -1,4 +1,3 @@
-
 QT       += core
 
 TEMPLATE = subdirs
@@ -9,7 +8,7 @@ DESTDIR = ./bin
 
 SUBDIRS = plugins/scg \
           #plugins/scn \
-         #plugins/scs \
-          kbe
-          #antlr3c/
+#          plugins/scs \
+           PiedPiper
+
 #win32: SUBDIRS += updater

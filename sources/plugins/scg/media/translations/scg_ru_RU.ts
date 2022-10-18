@@ -6,7 +6,7 @@
     <message>
         <location filename="../../commands/scgcommandchangeincedentobject.cpp" line="21"/>
         <source>Change incident object</source>
-        <translation>Именение инцидентного объекта</translation>
+        <translation>Изменение инцидентного объекта</translation>
     </message>
     <message>
         <location filename="../../commands/scgcommandclone.cpp" line="15"/>
@@ -101,7 +101,7 @@
     <message>
         <location filename="../../commands/scgcommandselectedobjectmove.cpp" line="15"/>
         <source>Move items</source>
-        <translation>Премещение группы sc.g-элементов</translation>
+        <translation>Перемещение группы sc.g-элементов</translation>
     </message>
     <message>
         <location filename="../../commands/scgcommandswappairorient.cpp" line="13"/>
@@ -233,7 +233,7 @@ Just 1.6 and 2.0 versions supported.</source>
     <message>
         <location filename="../../commands/scgcommandremovebreakpoints.cpp" line="18"/>
         <source>Remove pair&apos;s break points</source>
-        <translation>Удалитьточки излома дуги </translation>
+        <translation>Удалить точки излома дуги </translation>
     </message>
 </context>
 <context>
@@ -452,11 +452,6 @@ Just 1.6 and 2.0 versions supported.</source>
     </message>
     <message>
         <location filename="../../scgtypedialog.cpp" line="25"/>
-        <source>Meta</source>
-        <translation>Метапеременные</translation>
-    </message>
-    <message>
-        <location filename="../../scgtypedialog.cpp" line="27"/>
         <source>Constancy unknown</source>
         <translation>Константность неизвестна</translation>
     </message>

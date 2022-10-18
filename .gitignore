@@ -1,0 +1,15 @@
+build-*/*
+all-build-desktop/*
+*.qm
+*.user
+*.user.*
+
+*~
+
+sources/kbe/ui_mainwindow.h
+
+installer/sources/*
+
+.DS_Store
+sources/.DS_Store
+sources/kbe/.DS_Store

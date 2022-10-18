@@ -95,7 +95,7 @@ void SCgView::createActions()
     connect(mActionHideAllContent, SIGNAL(triggered(bool)), this, SLOT(setContentVisible(bool)));
 
     mActionDeleteContent = new QAction(mWindow->findIcon("edit-content-delete.png"), tr("Delete content"), mWindow);
-    mActionDeleteContent->setShortcut(QKeySequence( tr("D") ));
+    mActionDeleteContent->setShortcut(QKeySequence( tr("delete") ));
     mWindow->addAction(mActionDeleteContent);
     connect(mActionDeleteContent, SIGNAL(triggered()), this, SLOT(deleteContent()));
 
@@ -110,7 +110,7 @@ void SCgView::createActions()
     connect(mActionDelete, SIGNAL(triggered()), this, SLOT(deleteSelected()));
 
     mActionContourDelete = new QAction(mWindow->findIcon("edit-delete.png"), tr("Delete contour"), mWindow);
-    mActionContourDelete->setShortcut( QKeySequence(tr("Backspace")) );
+    mActionContourDelete->setShortcut( QKeySequence(tr("delete")) );
     mWindow->addAction(mActionContourDelete);
     connect(mActionContourDelete, SIGNAL(triggered()), this, SLOT(deleteJustContour()));
 
@@ -314,7 +314,7 @@ void SCgView::keyReleaseEvent(QKeyEvent *event)
 
 void SCgView::mouseMoveEvent (QMouseEvent * event)
 {
-    if(event->buttons() & Qt::MidButton)
+    if(event->buttons() & Qt::MiddleButton)
     {
         viewport()->setCursor(Qt::ClosedHandCursor);
         QScrollBar *hBar = horizontalScrollBar();
@@ -331,7 +331,7 @@ void SCgView::mouseMoveEvent (QMouseEvent * event)
 
 void SCgView::mousePressEvent (QMouseEvent * event)
 {
-    if(event->button() == Qt::MidButton)
+    if(event->button() == Qt::MiddleButton)
     {
         viewport()->setCursor(Qt::OpenHandCursor);
         mPrevMousePos = event->pos();
@@ -342,7 +342,7 @@ void SCgView::mousePressEvent (QMouseEvent * event)
 
 void SCgView::mouseReleaseEvent (QMouseEvent * event)
 {
-    if(event->button() == Qt::MidButton)
+    if(event->button() == Qt::MiddleButton)
     {
         viewport()->setCursor(Qt::ArrowCursor);
         mPrevMousePos = event->pos();
@@ -352,31 +352,12 @@ void SCgView::mouseReleaseEvent (QMouseEvent * event)
 }
 
 
-void SCgView::dragEnterEvent(QDragEnterEvent *evt)
-{
-    evt->acceptProposedAction();
-}
-
-void SCgView::dragLeaveEvent(QDragLeaveEvent *evt)
-{
-    evt->accept();
-}
-
-void SCgView::dragMoveEvent(QDragMoveEvent *evt)
-{
-    evt->acceptProposedAction();
-}
-
-void SCgView::dropEvent(QDropEvent *event)
-{
-    QGraphicsView::dropEvent(event);
-    event->acceptProposedAction();
-}
 
 void SCgView::wheelEvent(QWheelEvent *event)
 {
-    if(event->modifiers() == Qt::ControlModifier)
-        setScale(pow(2.0, event->delta() / 280.0));
+    if(event->modifiers() == Qt::ControlModifier){
+       setScale(pow(2.0, event->angleDelta().y() / 280.0));
+    }
     else
         QGraphicsView::wheelEvent(event);
 }

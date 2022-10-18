@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     QApplication::setAttribute(Qt::AA_Use96Dpi);
 
     a.setOrganizationName("Pied Piper");
-    a.setOrganizationDomain("Mcorp");
+    a.setOrganizationDomain("Pied Piper");
     a.setApplicationName("Pied Piper");
 
     a.setAttribute(Qt::AA_DontShowIconsInMenus, false);
@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
     //    root_dir.cdUp();
     //#endif
     Config::pathPlugins = root_dir;
-    Config::pathPlugins.cd("plugins");
+    Config::pathPlugins.cd("plugIns");
 
 
     // Create splash screen

@@ -117,9 +117,6 @@ void MainWindow::createToolBars()
     mToolBarFile->addAction(ui->actionSave);
     mToolBarFile->addAction(ui->actionSave_as);
 
-    mToolBarFile->addSeparator();
-    mToolBarFile->addAction(ui->actionClose);
-
     mToolBarFile->setObjectName("Main Tools");
     mToolBarFile->setWindowTitle(tr("Main Tools"));
 
@@ -138,7 +135,6 @@ void MainWindow::createActions()
     ui->actionSave->setIcon(QIcon::fromTheme("document-save", getIcon("document-save.png")));
     ui->actionSave_as->setIcon(QIcon::fromTheme("document-save-as", getIcon("document-save-as.png")));
     ui->actionSave_Project->setIcon(QIcon::fromTheme("document-save", getIcon("document-save-as.png")));
-    ui->actionClose->setIcon(QIcon::fromTheme("window-close", getIcon("window-close.png")));
     ui->actionExit->setIcon(QIcon::fromTheme("application-exit", getIcon("application-exit.png")));
 
     ui->actionAbout->setIcon(QIcon::fromTheme("help-browser", getIcon("help-browser.png")));
@@ -150,13 +146,6 @@ void MainWindow::createActions()
     connect(ui->actionSave_as, SIGNAL(triggered()), this, SLOT(onFileSaveAs()));
     connect(ui->actionSave_all, SIGNAL(triggered()), this, SLOT(onFileSaveAll()));
     connect(ui->actionTo_image, SIGNAL(triggered()), this, SLOT(onFileExportToImage()));
-
-    connect(ui->actionClose_All, SIGNAL(triggered()), mTabWidget, SLOT(closeAllDocuments()));
-    connect(ui->actionClose, SIGNAL(triggered()), mTabWidget, SLOT(close()));
-    connect(ui->actionClose_Others, SIGNAL(triggered()), mTabWidget, SLOT(closeOtherDocuments()));
-    connect(ui->actionClose, SIGNAL(triggered()), this, SLOT(onUpdateMenu()));
-    connect(ui->actionClose_Others, SIGNAL(triggered()), this, SLOT(onUpdateMenu()));
-    connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(onFileExit()));
 
     connect(ui->actionSettings, SIGNAL(triggered()), this, SLOT(onViewSettings()));
 
@@ -227,9 +216,7 @@ void MainWindow::onUpdateMenu()
     ui->actionSave_as->setEnabled(subWindow != 0);
     ui->actionSave_all->setEnabled(subWindow != 0 && !checkSubWindowSavedState());
 
-    ui->actionClose->setEnabled(subWindow != 0);
-    ui->actionClose_All->setEnabled(subWindow != 0);
-    ui->actionClose_Others->setEnabled(mTabWidget->subWindowList().size() > 1);
+
 }
 
 void MainWindow::updateRecentFileActions()

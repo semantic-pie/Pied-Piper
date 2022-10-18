@@ -12,6 +12,7 @@
 #include "scgtextitem.h"
 
 #include <QTextCodec>
+#include <QTextStream>
 
 GwfStreamWriter::GwfStreamWriter(): QXmlStreamWriter(),
                                     isWritingStarted(false)
@@ -41,13 +42,13 @@ void GwfStreamWriter::setDevice(QIODevice* device)
 void GwfStreamWriter::startWriting(const char* encoding)
 {
     QTextCodec *codec = QTextCodec::codecForName(encoding);
-    setCodec(codec);
-    setAutoFormatting(true);
-    writeStartDocument();
-    writeStartElement("GWF");
-    writeAttribute("version", "2.0");
-    writeStartElement("staticSector");
-    isWritingStarted = true;
+      codec->toUnicode(encoding);
+      setAutoFormatting(true);
+      writeStartDocument();
+      writeStartElement("GWF");
+      writeAttribute("version", "2.0");
+      writeStartElement("staticSector");
+      isWritingStarted = true;
 }
 
 void GwfStreamWriter::finishWriting()
@@ -194,7 +195,7 @@ void GwfStreamWriter::writeContour(SCgObject *obj)
 
 
     QVector<QPointF> points(contour->scenePoints());
-    if (contour->idtfValue() != NULL) {
+    if (contour->idtfValue() != nullptr) {
         writeAttribute("idtf_pos_x", QString::number((int)contour->idtfPos().x()));
         writeAttribute("idtf_pos_y", QString::number((int)contour->idtfPos().y()));
     }
