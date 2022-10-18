@@ -4,7 +4,7 @@
 
 DESTDIR = ../bin
 
-QT      += xml widgets core5compat
+QT      += xml widgets
 macx: {
 CONFIG += app_bundle
 ICON = PiedPiper.icns

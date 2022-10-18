@@ -1,4 +1,4 @@
-QT += xml widgets concurrent core5compat
+QT += xml widgets concurrent
 TARGET        = $$qtLibraryTarget(scg)
 TEMPLATE      = lib
 INCLUDEPATH  += ../../PiedPiper \
