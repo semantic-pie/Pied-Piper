@@ -13,7 +13,6 @@
 #include <QApplication>
 #include <QTranslator>
 #include <QLocale>
-#include <QTextCodec>
 #include <QFileInfo>
 #include <QDir>
 #include <QFile>

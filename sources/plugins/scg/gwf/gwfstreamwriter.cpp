@@ -11,8 +11,6 @@
 #include "scgbus.h"
 #include "scgtextitem.h"
 
-#include <QTextCodec>
-#include <QTextStream>
 
 GwfStreamWriter::GwfStreamWriter(): QXmlStreamWriter(),
                                     isWritingStarted(false)
@@ -41,8 +39,8 @@ void GwfStreamWriter::setDevice(QIODevice* device)
 
 void GwfStreamWriter::startWriting(const char* encoding)
 {
-    QTextCodec *codec = QTextCodec::codecForName(encoding);
-      codec->toUnicode(encoding);
+    // QTextCodec *codec = QTextCodec::codecForName(encoding);
+    //   codec->toUnicode(encoding);
       setAutoFormatting(true);
       writeStartDocument();
       writeStartElement("GWF");

@@ -13,7 +13,6 @@
 
 #include <QMessageBox>
 #include <QFile>
-#include <QTextCodec>
 #include <QApplication>
 
 
