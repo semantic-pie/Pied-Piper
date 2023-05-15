@@ -26,7 +26,7 @@ SCgCommandCreateBus::SCgCommandCreateBus(SCgScene *scene,
 
 SCgCommandCreateBus::~SCgCommandCreateBus()
 {
-    if (mObject)
+
         delete mObject;
 }
 
@@ -37,7 +37,7 @@ void SCgCommandCreateBus::busDestroyed()
 
 void SCgCommandCreateBus::redo()
 {
-    Q_ASSERT_X(mObject != 0,
+    Q_ASSERT_X(mObject != nullptr,
                "void SCgCommandCreateBus::redo()",
                "Bus doesn't exists");
     SCgBaseCommand::redo();
@@ -48,17 +48,17 @@ void SCgCommandCreateBus::redo()
     mObject->setParentItem(mParentContour);
     mObject->setDead(false);
 
-    static_cast<SCgBus*>(mObject)->setOwner(mOwner);
+    dynamic_cast<SCgBus*>(mObject)->setOwner(mOwner);
 }
 
 void SCgCommandCreateBus::undo()
 {
-    Q_ASSERT_X(mObject != 0,
+    Q_ASSERT_X(mObject != nullptr,
                "void SCgCommandCreateBus::undo()",
                "Bus doesn't exists");
 
-    static_cast<SCgBus*>(mObject)->setOwner(0);
-    mObject->setParentItem(0);
+    dynamic_cast<SCgBus*>(mObject)->setOwner(nullptr);
+    mObject->setParentItem(nullptr);
 
     mScene->removeItem(mObject);
     mObject->setDead(true);

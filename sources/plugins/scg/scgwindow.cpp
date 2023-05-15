@@ -61,25 +61,25 @@ const qreal SCgWindow::maxScale = 9.99;
 
 SCgWindow::SCgWindow(const QString& _windowTitle, QWidget *parent)
     : QWidget(parent)
-    , mView(0)
-    , mScene(0)
-    , mZoomFactorLine(0)
-    , mMinimap(0)
-    , mUndoView(0)
-    , mFindWidget(0)
-    , mToolBar(0)
-    , mUndoStack(0)
-    , mEditMenu(0)
-    , mActionUndo(0)
-    , mActionRedo(0)
-    , mActionFind(0)
+    , mView(nullptr)
+    , mScene(nullptr)
+    , mZoomFactorLine(nullptr)
+    , mMinimap(nullptr)
+    , mUndoView(nullptr)
+    , mFindWidget(nullptr)
+    , mToolBar(nullptr)
+    , mUndoStack(nullptr)
+    , mEditMenu(nullptr)
+    , mActionUndo(nullptr)
+    , mActionRedo(nullptr)
+    , mActionFind(nullptr)
 {
     Q_UNUSED(_windowTitle);
 
     mUndoStack = new QUndoStack(this);
     /////////////////////////////////////////////////
     //Creating main environment
-    mView = new SCgView(0, this);
+    mView = new SCgView(nullptr, this);
     mScene = new SCgScene(mUndoStack, mView);
     mView->setScene(mScene);
 
@@ -93,7 +93,7 @@ SCgWindow::SCgWindow(const QString& _windowTitle, QWidget *parent)
     connect(mFindWidget, SIGNAL(findPrevious()), this, SLOT(findPrevious()));
     connect(mFindWidget, SIGNAL(find(QString)), this, SLOT(findTextChanged(QString)));
 
-    QVBoxLayout *layout = new QVBoxLayout;
+    auto *layout = new QVBoxLayout;
     layout->addWidget(mView);
     layout->addWidget(mFindWidget);
 
@@ -171,10 +171,10 @@ void SCgWindow::createToolBar()
 
     mToolBar->setIconSize(QSize(32, 32));
 
-    QActionGroup* group = new QActionGroup(mToolBar);
+    auto* group = new QActionGroup(mToolBar);
 
     // Select mode
-    QAction *action = new QAction(findIcon("tool-select.png"), tr("Selection mode"), mToolBar);
+    auto *action = new QAction(findIcon("tool-select.png"), tr("Selection mode"), mToolBar);
     action->setCheckable(true);
     action->setChecked(true);
     action->setShortcut(QKeySequence(tr("1", "Selection mode")));
@@ -215,7 +215,7 @@ void SCgWindow::createToolBar()
     //
 
     // align group button
-    QToolButton *alignButton = new QToolButton(mToolBar);
+    auto *alignButton = new QToolButton(mToolBar);
     alignButton->setIcon(findIcon("tool-align.png"));
     alignButton->setPopupMode(QToolButton::InstantPopup);
     alignButton->setToolTip(tr("Alignment"));
@@ -250,7 +250,7 @@ void SCgWindow::createToolBar()
     connect(action, SIGNAL(triggered()), this, SLOT(onHorizontalAlignment()));
 
     // selection group button
-    QToolButton *selectButton = new QToolButton(mToolBar);
+    auto *selectButton = new QToolButton(mToolBar);
     selectButton->setIcon(findIcon("tool-select-group.png"));
     selectButton->setPopupMode(QToolButton::InstantPopup);
     selectButton->setToolTip(tr("Selection group"));
@@ -295,7 +295,7 @@ void SCgWindow::createToolBar()
     connect(action, SIGNAL(triggered()), this, SLOT(onZoomIn()));
 
     //Scale combobox
-    QComboBox* b = new QComboBox(mToolBar);
+    auto* b = new QComboBox(mToolBar);
     b->setEditable(true);
     b->setInsertPolicy(QComboBox::NoInsert);
     b->addItems(SCgWindow::mScales);
@@ -303,7 +303,7 @@ void SCgWindow::createToolBar()
     mZoomFactorLine = b->lineEdit();
     mZoomFactorLine->setInputMask("D90%");
     mToolBar->addWidget(b);
-    connect(mZoomFactorLine, SIGNAL(textChanged(const QString&)), mView, SLOT(setScale(const QString&)));
+    connect(mZoomFactorLine, SIGNAL(textChanged(QString)), mView, SLOT(setScale(QString)));
     connect(mView, SIGNAL(scaleChanged(qreal)), this, SLOT(onViewScaleChanged(qreal)));
 
     //Zoom out
@@ -370,28 +370,28 @@ void SCgWindow::_update()
 
 void SCgWindow::onSelectMode()
 {
-    static_cast<SCgScene*>(mView->scene())->setEditMode(SCgScene::Mode_Select);
+    dynamic_cast<SCgScene*>(mView->scene())->setEditMode(SCgScene::Mode_Select);
     mView->viewport()->setCursor(Qt::ArrowCursor);
     mView->setDragMode(QGraphicsView::RubberBandDrag);
 }
 
 void SCgWindow::onPairMode()
 {
-    static_cast<SCgScene*>(mView->scene())->setEditMode(SCgScene::Mode_Pair);
+    dynamic_cast<SCgScene*>(mView->scene())->setEditMode(SCgScene::Mode_Pair);
     mView->viewport()->setCursor(Qt::UpArrowCursor);
     mView->setDragMode(QGraphicsView::NoDrag);
 }
 
 void SCgWindow::onBusMode()
 {
-    static_cast<SCgScene*>(mView->scene())->setEditMode(SCgScene::Mode_Bus);
+    dynamic_cast<SCgScene*>(mView->scene())->setEditMode(SCgScene::Mode_Bus);
     mView->viewport()->setCursor(Qt::CrossCursor);
     mView->setDragMode(QGraphicsView::NoDrag);
 }
 
 void SCgWindow::onContourMode()
 {
-    static_cast<SCgScene*>(mView->scene())->setEditMode(SCgScene::Mode_Contour);
+    dynamic_cast<SCgScene*>(mView->scene())->setEditMode(SCgScene::Mode_Contour);
     mView->viewport()->setCursor(Qt::CrossCursor);
     mView->setDragMode(QGraphicsView::NoDrag);
 }

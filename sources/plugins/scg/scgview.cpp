@@ -13,43 +13,40 @@
 #include "scgwindow.h"
 #include "scgtypedialog.h"
 
-#include <math.h>
+#include <cmath>
 #include <QUrl>
 #include <QContextMenuEvent>
 #include <QMenu>
-#include <QKeyEvent>
 #include <QScrollBar>
 #include <QDialog>
 #include <QLabel>
 #include <QDialogButtonBox>
 #include <QLineEdit>
 #include <QLayout>
-#include <QUndoStack>
 #include <QCompleter>
 #include <QFileInfo>
 #include<QSettings>
 
 SCgView::SCgView(QWidget *parent, SCgWindow *window) :
-    QGraphicsView(parent),
-    mActionChangeContent(0),
-    mActionShowContent(0),
-    mActionShowAllContent(0),
-    mActionHideAllContent(0),
-    mActionDeleteContent(0),
-    mActionChangeIdtf(0),
-    mActionDelete(0),
-    mActionContourDelete(0),
-    mActionSwapPairOrient(0),
-    mActionCopy(0),
-    mActionCut(0),
-    mActionPaste(0),
-    mActionSelectAll(0),
-    mActionSaveTemp(0),
-    mContextMenu(0),
-    mContextObject(0),
-    mWindow(window),
-    isSceneRectControlled(false)
-{
+        QGraphicsView(parent),
+        mActionChangeContent(nullptr),
+        mActionShowContent(nullptr),
+        mActionShowAllContent(nullptr),
+        mActionHideAllContent(nullptr),
+        mActionDeleteContent(nullptr),
+        mActionSaveTemp(nullptr),
+        mActionChangeIdtf(nullptr),
+        mActionDelete(nullptr),
+        mActionContourDelete(nullptr),
+        mActionSwapPairOrient(nullptr),
+        mActionCopy(nullptr),
+        mActionCut(nullptr),
+        mActionPaste(nullptr),
+        mActionSelectAll(nullptr),
+        mContextMenu(nullptr),
+        mContextObject(nullptr),
+        mWindow(window),
+        isSceneRectControlled(false) {
     setCacheMode(CacheNone);//CacheBackground);
     setViewportUpdateMode(BoundingRectViewportUpdate);
     setRenderHint(QPainter::Antialiasing);
@@ -58,39 +55,44 @@ SCgView::SCgView(QWidget *parent, SCgWindow *window) :
     setOptimizationFlag(DontAdjustForAntialiasing);
     setDragMode(QGraphicsView::RubberBandDrag);
     setAcceptDrops(true);
-    connect(mWindow->undoStack(), SIGNAL(indexChanged(int)), this, SLOT(updateActionsState(int)) );
+    connect(mWindow->undoStack(), SIGNAL(indexChanged(int)), this, SLOT(updateActionsState(int)));
     createActions();
 }
 
-SCgView::~SCgView()
-{
-    if (mContextMenu)   delete mContextMenu;
-    mContextObject = 0;
+SCgView::~SCgView() {
+    delete mContextMenu;
+    mContextObject = nullptr;
 }
 
-void SCgView::createActions()
-{
-    QAction* sep = new QAction(this);
+void SCgView::createActions() {
+    QList<QKeySequence> shortcuts;
+
+    auto *sep = new QAction(this);
     sep->setSeparator(true);
     mActionsList.append(sep);
 
     mActionSaveTemp = new QAction(tr("Save as template"), mWindow);
     mWindow->addAction(mActionSaveTemp);
     connect(mActionSaveTemp, SIGNAL(triggered(bool)), this, SLOT(showSaveTempDialog()));
-
     mActionChangeType = new QAction(tr("Select type"), mWindow);
-    mActionChangeType->setShortcut(QKeySequence( tr("T") ));
+    shortcuts << Qt::Key_T << QKeySequence("Е");
+    mActionChangeType->setShortcuts(shortcuts);
+    shortcuts.clear();
     mWindow->addAction(mActionChangeType);
     connect(mActionChangeType, SIGNAL(triggered(bool)), this, SLOT(showTypeDialog()));
 
-    mActionChangeContent = new QAction(mWindow->findIcon("edit-content-change.png"),tr("Set content"),mWindow);
-    mActionChangeContent->setShortcut(QKeySequence( tr("C") ));
+    mActionChangeContent = new QAction(SCgWindow::findIcon("edit-content-change.png"), tr("Set content"), mWindow);
+    shortcuts << Qt::Key_C << QKeySequence(tr("С"));
+    mActionChangeContent->setShortcuts(shortcuts);
+    shortcuts.clear();
     mWindow->addAction(mActionChangeContent);
     connect(mActionChangeContent, SIGNAL(triggered()), this, SLOT(changeContent()));
 
-    mActionShowContent = new QAction(tr("Show content"),mWindow);
+    mActionShowContent = new QAction(tr("Show content"), mWindow);
     mActionShowContent->setCheckable(true);
-    mActionShowContent->setShortcut(QKeySequence( tr("H") ));
+    shortcuts << Qt::Key_H << QKeySequence("Р");
+    mActionShowContent->setShortcuts(shortcuts);
+    shortcuts.clear();
     mWindow->addAction(mActionShowContent);
     connect(mActionShowContent, SIGNAL(triggered(bool)), this, SLOT(setContentVisible(bool)));
 
@@ -100,47 +102,55 @@ void SCgView::createActions()
     mActionHideAllContent = new QAction(tr("Hide all content"), mWindow);
     connect(mActionHideAllContent, SIGNAL(triggered(bool)), this, SLOT(setContentVisible(bool)));
 
-    mActionDeleteContent = new QAction(mWindow->findIcon("edit-content-delete.png"), tr("Delete content"), mWindow);
-    mActionDeleteContent->setShortcut(QKeySequence( tr("delete") ));
+    mActionDeleteContent = new QAction(SCgWindow::findIcon("edit-content-delete.png"), tr("Delete content"), mWindow);
+    mActionDeleteContent->setShortcut(Qt::Key_Backspace);
     mWindow->addAction(mActionDeleteContent);
     connect(mActionDeleteContent, SIGNAL(triggered()), this, SLOT(deleteContent()));
 
-    mActionChangeIdtf = new QAction(mWindow->findIcon("edit-change-idtf.png"), tr("Change identifier"), mWindow);
-    mActionChangeIdtf->setShortcut(QKeySequence( tr("I") ));
+    mActionChangeIdtf = new QAction(SCgWindow::findIcon("edit-change-idtf.png"), tr("Change identifier"), mWindow);
+    shortcuts << Qt::Key_I << QKeySequence("Ш");
+    mActionChangeIdtf->setShortcuts(shortcuts);
+    shortcuts.clear();
     mWindow->addAction(mActionChangeIdtf);
     connect(mActionChangeIdtf, SIGNAL(triggered()), this, SLOT(changeIdentifier()));
 
-    mActionDelete = new QAction(QIcon::fromTheme("edit-delete", mWindow->findIcon("edit-delete.png")), tr("Delete"), mWindow);
-    mActionDelete->setShortcut(QKeySequence::Delete);
+    mActionDelete = new QAction(QIcon::fromTheme("edit-delete", SCgWindow::findIcon("edit-delete.png")), tr("Delete"),
+                                mWindow);
+    mActionDelete->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Backspace));
     mWindow->addAction(mActionDelete);
     connect(mActionDelete, SIGNAL(triggered()), this, SLOT(deleteSelected()));
 
-    mActionContourDelete = new QAction(mWindow->findIcon("edit-delete.png"), tr("Delete contour"), mWindow);
-    mActionContourDelete->setShortcut( QKeySequence(tr("delete")) );
+    mActionContourDelete = new QAction(SCgWindow::findIcon("edit-delete.png"), tr("Delete contour"), mWindow);
+    mActionContourDelete->setShortcut(Qt::Key_Backspace);
     mWindow->addAction(mActionContourDelete);
     connect(mActionContourDelete, SIGNAL(triggered()), this, SLOT(deleteJustContour()));
 
-    mActionSwapPairOrient = new QAction(mWindow->findIcon("edit-swap-pair.png"), tr("Swap orientation"), mWindow);
-    mActionSwapPairOrient->setShortcut( QKeySequence(tr("S")));
+    mActionSwapPairOrient = new QAction(SCgWindow::findIcon("edit-swap-pair.png"), tr("Swap orientation"), mWindow);
+    shortcuts << Qt::Key_S << QKeySequence(tr("Ы"));
+    mActionSwapPairOrient->setShortcuts(shortcuts);
+    shortcuts.clear();
     mWindow->addAction(mActionSwapPairOrient);
     connect(mActionSwapPairOrient, SIGNAL(triggered()), this, SLOT(swapPairOrient()));
 
-    mActionCopy = new QAction(QIcon::fromTheme("edit-copy", mWindow->findIcon("edit-copy.png")), tr("Copy"),this);
+    mActionCopy = new QAction(QIcon::fromTheme("edit-copy", SCgWindow::findIcon("edit-copy.png")), tr("Copy"), this);
     mActionCopy->setShortcut(QKeySequence::Copy);
+
     mWindow->addAction(mActionCopy);
     connect(mActionCopy, SIGNAL(triggered()), mWindow, SLOT(copy()));
 
-    mActionCut = new QAction(QIcon::fromTheme("edit-cut", mWindow->findIcon("edit-cut.png")), tr("Cut"),this);
+    mActionCut = new QAction(QIcon::fromTheme("edit-cut", SCgWindow::findIcon("edit-cut.png")), tr("Cut"), this);
     mActionCut->setShortcut(QKeySequence::Cut);
     mWindow->addAction(mActionCut);
     connect(mActionCut, SIGNAL(triggered()), mWindow, SLOT(cut()));
 
-    mActionPaste = new QAction(QIcon::fromTheme("edit-paste", mWindow->findIcon("edit-paste.png")), tr("Paste"),this);
+    mActionPaste = new QAction(QIcon::fromTheme("edit-paste", SCgWindow::findIcon("edit-paste.png")), tr("Paste"),
+                               this);
     mActionPaste->setShortcut(QKeySequence::Paste);
     mWindow->addAction(mActionPaste);
     connect(mActionPaste, SIGNAL(triggered()), mWindow, SLOT(paste()));
 
-    mActionSelectAll = new QAction(QIcon::fromTheme("edit-select-all", mWindow->findIcon("edit-select-all.png")), tr("Select All"),this);
+    mActionSelectAll = new QAction(QIcon::fromTheme("edit-select-all", SCgWindow::findIcon("edit-select-all.png")),
+                                   tr("Select All"), this);
     mActionSelectAll->setShortcut(QKeySequence::SelectAll);
     mWindow->addAction(mActionSelectAll);
     connect(mActionSelectAll, SIGNAL(triggered()), this, SLOT(selectAllCommand()));
@@ -181,33 +191,29 @@ void SCgView::createActions()
     mActionsList.append(mActionDelete);
 }
 
-void SCgView::updateActionsState(int idx)
-{
-    Q_UNUSED(idx);
+void SCgView::updateActionsState(int idx) {
+    Q_UNUSED(idx)
 
-    mContextObject = 0;
+    mContextObject = nullptr;
 
-    QList <QGraphicsItem*> items = scene()->selectedItems();
-    if(items.size() == 1)
-        if(SCgObject::isSCgObjectType(items.first()->type()))
-            mContextObject = static_cast<SCgObject*>(items.first());
+    QList<QGraphicsItem *> items = scene()->selectedItems();
+    if (items.size() == 1)
+        if (SCgObject::isSCgObjectType(items.first()->type()))
+            mContextObject = dynamic_cast<SCgObject *>(items.first());
 
     bool const nodeType = (mContextObject) && (mContextObject->type() == SCgNode::Type);
 
-    if(nodeType)
-    {
+    if (nodeType) {
         mActionChangeContent->setEnabled(true);
         mActionChangeContent->setVisible(true);
-        SCgNode *node = static_cast<SCgNode*>(mContextObject);
+        auto *node = dynamic_cast<SCgNode *>(mContextObject);
 
         bool isContentData = node->isContentData();
-        if(isContentData)
-        {
+        if (isContentData) {
             mActionChangeContent->setText(tr("Change content"));
 
             mActionShowContent->setChecked(node->isContentVisible());
-        }
-        else
+        } else
             mActionChangeContent->setText(tr("Set content"));
 
         mActionDeleteContent->setEnabled(isContentData);
@@ -216,8 +222,7 @@ void SCgView::updateActionsState(int idx)
         mActionShowContent->setEnabled(isContentData);
         mActionShowContent->setVisible(isContentData);
 
-    }else
-    {
+    } else {
         mActionChangeContent->setEnabled(false);
         mActionChangeContent->setVisible(false);
         mActionShowContent->setEnabled(false);
@@ -250,11 +255,10 @@ void SCgView::updateActionsState(int idx)
 
     //check for showed/hidden contents
     items = scene()->items();
-    SCgNode *node = 0;
+    SCgNode *node;
     bool oneContentShowed = false, oneContentHidden = false;
-    for(int i = 0; i < items.size(); ++i)
-    {
-        node = qgraphicsitem_cast<SCgNode*>(items.at(i));
+    for (auto item : items) {
+        node = qgraphicsitem_cast<SCgNode *>(item);
         if (node && node->isContentVisible())
             oneContentShowed = true;
         else if (node && !node->isContentVisible() && node->isContentData())
@@ -264,13 +268,11 @@ void SCgView::updateActionsState(int idx)
     mActionHideAllContent->setEnabled(oneContentShowed);
 }
 
-QList<QAction*> SCgView::actions() const
-{
+QList<QAction *> SCgView::actions() const {
     return mActionsList;
 }
 
-void SCgView::contextMenuEvent(QContextMenuEvent *event)
-{
+void SCgView::contextMenuEvent(QContextMenuEvent *event) {
     if (event->reason() == QContextMenuEvent::Keyboard || event->reason() == QContextMenuEvent::Other)
         return;
     // get scg-object under mouse
@@ -278,18 +280,16 @@ void SCgView::contextMenuEvent(QContextMenuEvent *event)
                                 QPointF(horizontalScrollBar()->value(), verticalScrollBar()->value()) -
                                 scene()->sceneRect().topLeft();*/
 
-    SCgObject *object = static_cast<SCgScene*>(scene())->objectAt(mousePos);
+    SCgObject *object = dynamic_cast<SCgScene *>(scene())->objectAt(mousePos);
 
     // create context menu
-    if (mContextMenu)
-    {
+    if (mContextMenu) {
         delete mContextMenu;
-        mContextMenu = 0;
+        mContextMenu = nullptr;
     }
 
     // selection by right mouse click
-    if(object && !object->isSelected())
-    {
+    if (object && !object->isSelected()) {
         scene()->clearSelection();
         object->setSelected(true);
     }
@@ -301,28 +301,23 @@ void SCgView::contextMenuEvent(QContextMenuEvent *event)
     mContextMenu->exec(event->globalPos());
 }
 
-void SCgView::selectAllCommand() const
-{
-    QList<QGraphicsItem*> list = items();
-    QList<QGraphicsItem*>::iterator it = list.begin();
-    for(; it != list.end(); ++it)
+void SCgView::selectAllCommand() const {
+    QList<QGraphicsItem *> list = items();
+    QList<QGraphicsItem *>::iterator it = list.begin();
+    for (; it != list.end(); ++it)
         (*it)->setSelected(true);
 }
 
-void SCgView::keyPressEvent(QKeyEvent *event)
-{
+void SCgView::keyPressEvent(QKeyEvent *event) {
     QGraphicsView::keyPressEvent(event);
 }
 
-void SCgView::keyReleaseEvent(QKeyEvent *event)
-{
+void SCgView::keyReleaseEvent(QKeyEvent *event) {
     QGraphicsView::keyReleaseEvent(event);
 }
 
-void SCgView::mouseMoveEvent (QMouseEvent * event)
-{
-    if(event->buttons() & Qt::MiddleButton)
-    {
+void SCgView::mouseMoveEvent(QMouseEvent *event) {
+    if (event->buttons() & Qt::MiddleButton) {
         viewport()->setCursor(Qt::ClosedHandCursor);
         QScrollBar *hBar = horizontalScrollBar();
         QScrollBar *vBar = verticalScrollBar();
@@ -336,83 +331,70 @@ void SCgView::mouseMoveEvent (QMouseEvent * event)
 }
 
 
-void SCgView::mousePressEvent (QMouseEvent * event)
-{
-    if(event->button() == Qt::MiddleButton)
-    {
+void SCgView::mousePressEvent(QMouseEvent *event) {
+    if (event->button() == Qt::MiddleButton) {
         viewport()->setCursor(Qt::OpenHandCursor);
         mPrevMousePos = event->pos();
-    }
-    else
+    } else
         QGraphicsView::mousePressEvent(event);
 }
 
-void SCgView::mouseReleaseEvent (QMouseEvent * event)
-{
-    if(event->button() == Qt::MiddleButton)
-    {
+void SCgView::mouseReleaseEvent(QMouseEvent *event) {
+    if (event->button() == Qt::MiddleButton) {
         viewport()->setCursor(Qt::ArrowCursor);
         mPrevMousePos = event->pos();
-    }
-    else
+    } else
         QGraphicsView::mouseReleaseEvent(event);
 }
 
 
-
-void SCgView::wheelEvent(QWheelEvent *event)
-{
-    if(event->modifiers() == Qt::ControlModifier){
-       setScale(pow(2.0, event->angleDelta().y() / 280.0));
-    }
-    else
+void SCgView::wheelEvent(QWheelEvent *event) {
+    if (event->modifiers() == Qt::ControlModifier) {
+        setScale(pow(2.0, event->angleDelta().y() / 280.0));
+    } else
         QGraphicsView::wheelEvent(event);
 }
 
-void SCgView::deleteSelected()
-{
-    static_cast<SCgScene*>(scene())->deleteSelObjectsCommand();
+void SCgView::deleteSelected() {
+    dynamic_cast<SCgScene *>(scene())->deleteSelObjectsCommand();
 }
 
-void SCgView::deleteJustContour()
-{
+void SCgView::deleteJustContour() {
     Q_ASSERT(mContextObject && mContextObject->type() == SCgContour::Type);
 
-    SCgContour *contour = static_cast<SCgContour*>(mContextObject);
-    static_cast<SCgScene*>(scene())->deleteContourCommand(contour);
+    auto *contour = dynamic_cast<SCgContour *>(mContextObject);
+    dynamic_cast<SCgScene *>(scene())->deleteContourCommand(contour);
 }
 
-void SCgView::swapPairOrient()
-{
+void SCgView::swapPairOrient() {
     Q_ASSERT(mContextObject && mContextObject->type() == SCgPair::Type);
 
-    SCgPair *pair = static_cast<SCgPair*>(mContextObject);
-    static_cast<SCgScene*>(scene())->swapPairOrientCommand(pair);
+    auto *pair = dynamic_cast<SCgPair *>(mContextObject);
+    dynamic_cast<SCgScene *>(scene())->swapPairOrientCommand(pair);
 }
 
-void SCgView::changeIdentifier()
-{
+void SCgView::changeIdentifier() {
     Q_ASSERT(mContextObject);
 
     QDialog dialog(this);
     dialog.setWindowTitle(tr("Change identifier"));
 
-    QLabel* label = new QLabel(tr("New identifier:"),&dialog);
-    QLineEdit* lineEdit = new QLineEdit(&dialog);
+    auto *label = new QLabel(tr("New identifier:"), &dialog);
+    auto *lineEdit = new QLineEdit(&dialog);
 
-    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
+    auto *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
                                                        | QDialogButtonBox::Cancel);
     buttonBox->setParent(&dialog);
 
     connect(buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
     connect(buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
 
-    QVBoxLayout *layout = new QVBoxLayout;
+    auto *layout = new QVBoxLayout;
     layout->addWidget(label);
     layout->addWidget(lineEdit);
     layout->addWidget(buttonBox);
 
-    QCompleter *completer = new QCompleter(static_cast<SCgScene*>(scene())->idtfList(), &dialog);
+    auto *completer = new QCompleter(dynamic_cast<SCgScene *>(scene())->idtfList(), &dialog);
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     lineEdit->setCompleter(completer);
     QString oldIdtf = mContextObject->idtfValue();
@@ -423,46 +405,42 @@ void SCgView::changeIdentifier()
     dialog.setLayout(layout);
     lineEdit->setFocus();
 
-    if (dialog.exec())
-    {
+    if (dialog.exec()) {
         QString newIdtf = lineEdit->text();
-        if(oldIdtf != newIdtf)
-            static_cast<SCgScene*>(scene())->changeIdtfCommand(mContextObject, newIdtf);
+        if (oldIdtf != newIdtf)
+            dynamic_cast<SCgScene *>(scene())->changeIdtfCommand(mContextObject, newIdtf);
     }
 }
 
 
-void SCgView::showSaveTempDialog()
-{
+void SCgView::showSaveTempDialog() {
     QDialog dialog(this);
     dialog.setWindowTitle(tr("Save template"));
-    QLineEdit* lineEdit = new QLineEdit(&dialog);
-    QLabel* label = new QLabel(tr("File name:"),&dialog);
+    auto *lineEdit = new QLineEdit(&dialog);
+    auto *label = new QLabel(tr("File name:"), &dialog);
 
-    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
+    auto *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
                                                        | QDialogButtonBox::Cancel);
     buttonBox->setParent(&dialog);
 
     connect(buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
     connect(buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
 
-    QVBoxLayout *layout = new QVBoxLayout;
+    auto *layout = new QVBoxLayout;
     layout->addWidget(label);
     layout->addWidget(lineEdit);
     layout->addWidget(buttonBox);
     dialog.setLayout(layout);
     QSettings set;
-    QString fileName ;
-    if(dialog.exec() == QDialog::Accepted)
-    {
+    QString fileName;
+    if (dialog.exec() == QDialog::Accepted) {
         fileName = set.value("templateStorage").toString() + lineEdit->text() + ".gwf";
         mWindow->saveTempToFile(fileName);
     }
 }
 
 
-void SCgView::showTypeDialog()
-{
+void SCgView::showTypeDialog() {
     if (!mContextObject)
         return;
 
@@ -472,61 +450,50 @@ void SCgView::showTypeDialog()
         changeType(typeDialog.getChosenType());
 }
 
-void SCgView::changeType(const QString& newType)
-{
+void SCgView::changeType(const QString &newType) {
     Q_ASSERT(mContextObject);
 
-    static_cast<SCgScene*>(scene())->changeObjectTypeCommand(mContextObject, newType);
+    dynamic_cast<SCgScene *>(scene())->changeObjectTypeCommand(mContextObject, newType);
 }
 
-void SCgView::changeContent()
-{
+void SCgView::changeContent() {
     Q_ASSERT(mContextObject && mContextObject->type() == SCgNode::Type);
-    SCgNode *node = static_cast<SCgNode*>(mContextObject);
+    auto *node = dynamic_cast<SCgNode *>(mContextObject);
     SCgContentChangeDialog dlg(node, this);
 
-    if (dlg.exec() == QDialog::Accepted)
-    {
+    if (dlg.exec() == QDialog::Accepted) {
         SCgContent::ContInfo info;
         dlg.contentInfo(info);
         if (node->contentType() != SCgContent::Empty || info.type != SCgContent::Empty)
-            static_cast<SCgScene*>(scene())->changeContentDataCommand(node, info);
+            dynamic_cast<SCgScene *>(scene())->changeContentDataCommand(node, info);
     }
 }
 
-void SCgView::setContentVisible(bool visibility)
-{
-    QAction* _sender = static_cast<QAction*>(sender());
-    if (_sender == mActionShowContent)
-    {
+void SCgView::setContentVisible(bool visibility) {
+    auto *_sender = dynamic_cast<QAction *>(sender());
+    if (_sender == mActionShowContent) {
         Q_ASSERT(mContextObject && mContextObject->type() == SCgNode::Type);
 
-        SCgNode *node = static_cast<SCgNode*>(mContextObject);
+        auto *node = dynamic_cast<SCgNode *>(mContextObject);
 
-        if(visibility != node->isContentVisible())
-            static_cast<SCgScene*>(scene())->changeContentVisibilityCommand(node, visibility);
-    }
-    else if (_sender == mActionShowAllContent)
-    {
-        static_cast<SCgScene*>(scene())->changeContentVisibilityCommand(0, true, true);
-    }
-    else if(_sender == mActionHideAllContent)
-    {
-        static_cast<SCgScene*>(scene())->changeContentVisibilityCommand(0, false, true);
+        if (visibility != node->isContentVisible())
+            dynamic_cast<SCgScene *>(scene())->changeContentVisibilityCommand(node, visibility);
+    } else if (_sender == mActionShowAllContent) {
+        dynamic_cast<SCgScene *>(scene())->changeContentVisibilityCommand(nullptr, true, true);
+    } else if (_sender == mActionHideAllContent) {
+        dynamic_cast<SCgScene *>(scene())->changeContentVisibilityCommand(nullptr, false, true);
     }
 }
 
-void SCgView::deleteContent()
-{
+void SCgView::deleteContent() {
     Q_ASSERT(mContextObject && mContextObject->type() == SCgNode::Type);
 
-    SCgNode* node = static_cast<SCgNode*> (mContextObject);
+    auto *node = dynamic_cast<SCgNode *> (mContextObject);
     SCgContent::ContInfo empty;
-    static_cast<SCgScene*>(scene())->changeContentDataCommand(node, empty);
+    dynamic_cast<SCgScene *>(scene())->changeContentDataCommand(node, empty);
 }
 
-void SCgView::setScale(const QString& sc)
-{
+[[maybe_unused]] void SCgView::setScale(const QString &sc) {
     QTransform t = transform();
     //Default transform
     t.reset();
@@ -534,28 +501,25 @@ void SCgView::setScale(const QString& sc)
     //Getting percent value
     QString str = sc;
     str.remove("%");
-    double d = str.toDouble()/100.0;
+    double d = str.toDouble() / 100.0;
 
     //Checking if value d in proper range
     if (d < SCgWindow::minScale)
         d = SCgWindow::minScale;
-    else
-        if (d > SCgWindow::maxScale)
-            d = SCgWindow::maxScale;
+    else if (d > SCgWindow::maxScale)
+        d = SCgWindow::maxScale;
 
     //Setting transformation
-    setTransform(t.scale(d,d),false);
+    setTransform(t.scale(d, d), false);
 
     emit(scaleChanged(transform().mapRect(QRectF(0, 0, 1, 1)).width()));
 }
 
-void SCgView::setScale(qreal scaleFactor)
-{
+void SCgView::setScale(qreal scaleFactor) {
     // Factor, that will be set.
     qreal factor = transform().scale(scaleFactor, scaleFactor).mapRect(QRectF(0, 0, 1, 1)).width();
 
-    if (factor < SCgWindow::minScale || factor > SCgWindow::maxScale)
-    {
+    if (factor < SCgWindow::minScale || factor > SCgWindow::maxScale) {
         // current zoom factor.
         qreal currFacror = transform().mapRect(QRectF(0, 0, 1, 1)).width();
 
@@ -572,23 +536,20 @@ void SCgView::setScale(qreal scaleFactor)
     emit(scaleChanged(factor));
 }
 
-void SCgView::setScene(SCgScene* scene)
-{
+void SCgView::setScene(SCgScene *scene) {
     QGraphicsView::setScene(scene);
-    connect(scene, SIGNAL(sceneRectChanged(const QRectF&)), this, SLOT(updateSceneRect(const QRectF&)) );
-    connect(scene, SIGNAL(selectionChanged()), this, SLOT(updateActionsState()) );
+    connect(scene, SIGNAL(sceneRectChanged(QRectF)), this, SLOT(updateSceneRect(QRectF)));
+    connect(scene, SIGNAL(selectionChanged()), this, SLOT(updateActionsState()));
     connect(scene, SIGNAL(editModeChanged(int)), this, SLOT(editModeChanged(int)));
     updateActionsState();
 }
 
-void SCgView::updateSceneRect(const QRectF& rect)
-{
-    if(!isSceneRectControlled && !sceneRect().contains(rect))
+void SCgView::updateSceneRect(const QRectF &rect) {
+    if (!isSceneRectControlled && !sceneRect().contains(rect))
         isSceneRectControlled = true;
 
-    if(isSceneRectControlled)
-    {
-        QPointF topLeft = mapToScene(0,0);
+    if (isSceneRectControlled) {
+        QPointF topLeft = mapToScene(0, 0);
         QPointF bottomRight = mapToScene(viewport()->width(), viewport()->height());
         QRectF vis(topLeft, bottomRight);
         QRectF result = rect.adjusted(-100, -100, 100, 100).united(vis).united(sceneRect());
@@ -598,7 +559,6 @@ void SCgView::updateSceneRect(const QRectF& rect)
     }
 }
 
-void SCgView::editModeChanged(int mode)
-{
+void SCgView::editModeChanged(int mode) {
     setContextMenuPolicy(mode == SCgScene::Mode_Select ? Qt::DefaultContextMenu : Qt::NoContextMenu);
 }

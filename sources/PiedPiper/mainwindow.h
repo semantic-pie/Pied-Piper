@@ -54,7 +54,7 @@ public:
 
     /*! Load file with @p fileName
       */
-    void load(const QString fileName);
+    void load(const QString& fileName);
 
     /*! Drag and drop events
      */
@@ -80,7 +80,7 @@ protected:
 private:
     /*! Gets icon by name
       */
-    QIcon getIcon(const QString &name) const;
+    static QIcon getIcon(const QString &name) ;
 
     /*! Saves window into specified file given by @p name with extension @p ext (without leading dot).
      * @return true if saved correctly
@@ -110,7 +110,7 @@ private:
      * @param editorType Type of editor, key value should be generated for.
      * @return A value that should be used as a key for QSettings.setValue() to save editor layout.
      */
-    QString getSettingKeyValueForWindow(const QString& editorType) const;
+    static QString getSettingKeyValueForWindow(const QString& editorType) ;
 
     /*!
      * Saves main window layout including dock widgets and geometry.
@@ -138,9 +138,9 @@ private:
     //! Maximum size of list with recently opened files.
     enum { MaxRecentFiles = 5 };
     //! Actions for opening recent files.
-    QAction* recentFileActs[MaxRecentFiles];
+    QAction* recentFileActs[MaxRecentFiles]{};
     //! Separator in main menu for recently files.
-    QAction *separatorAct;
+    QAction *separatorAct{};
 
     //! Contains all dockWidgets. Maps from objectName to DockWidget with this objectName. @see updateDockWidgets(bool).
     QMap<QString, QDockWidget*> mDockWidgets;

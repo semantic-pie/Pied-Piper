@@ -24,15 +24,15 @@ public:
     explicit SCgCommandCreateNode(SCgScene *scene,
                                   const QPointF &point,
                                   SCgContour *parentContour,
-                                  QUndoCommand *parent = 0);
+                                  QUndoCommand *parent = nullptr);
     //! Destructor
-    virtual ~SCgCommandCreateNode();
+    ~SCgCommandCreateNode() override;
 
 protected:
     //! @see    QUndoCommand::redo
-    void redo();
+    void redo() override;
     //! @see    QUndoCommand::undo
-    void undo();
+    void undo() override;
 
     //! Node position in scene
     QPointF mPoint;

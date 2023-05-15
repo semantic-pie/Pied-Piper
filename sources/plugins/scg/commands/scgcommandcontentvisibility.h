@@ -20,15 +20,15 @@ public:
     explicit SCgCommandContentVisibility(SCgScene *scene,
                                          SCgNode *node,
                                          bool visibility,
-                                         QUndoCommand *parent = 0);
+                                         QUndoCommand *parent = nullptr);
     //! Destructor
-    virtual ~SCgCommandContentVisibility();
+    ~SCgCommandContentVisibility() override;
 
 protected:
     //! @see    QUndoCommand::redo
-    void redo();
+    void redo() override;
     //! @see    QUndoCommand::undo
-    void undo();
+    void undo() override;
 
     //! Pointer to sc.g-node for content show/hide
     SCgNode *mNode;
@@ -44,15 +44,15 @@ public:
       @param    visibility    Visibility flag
       @param    parent  Pointer to parent command
     */
-    explicit SCgCommandAllContentVisibility(SCgScene *scene, bool visibility, QUndoCommand *parent = 0);
+    explicit SCgCommandAllContentVisibility(SCgScene *scene, bool visibility, QUndoCommand *parent = nullptr);
     //! Destructor
-    virtual ~SCgCommandAllContentVisibility();
+    ~SCgCommandAllContentVisibility() override;
 
 protected:
     //! @see    QUndoCommand::redo
-    void redo();
+    void redo() override;
     //! @see    QUndoCommand::undo
-    void undo();
+    void undo() override;
 
 private:
     //! Visibility flag

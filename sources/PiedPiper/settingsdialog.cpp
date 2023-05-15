@@ -13,7 +13,7 @@
 
 SettingsDialog::SettingsDialog(QWidget * parent)
     : QDialog(parent)
-    , mGeneralTab(0)
+    , mGeneralTab(nullptr)
 {
     setWindowTitle(tr("Какие-то там настройки, блять"));
 
@@ -33,9 +33,7 @@ SettingsDialog::SettingsDialog(QWidget * parent)
 }
 
 SettingsDialog::~SettingsDialog()
-{
-
-}
+= default;
 
 void SettingsDialog::createGeneralTab()
 {

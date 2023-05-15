@@ -28,15 +28,15 @@ public:
                                  SCgNode *owner,
                                  const QVector<QPointF> &points,
                                  SCgContour *parentContour,
-                                 QUndoCommand *parent = 0);
+                                 QUndoCommand *parent = nullptr);
     //! Destructor
-    virtual ~SCgCommandCreateBus();
+    ~SCgCommandCreateBus() override;
 
 protected:
     //! @see    QUndoCommand::redo
-    void redo();
+    void redo() override;
     //! @see    QUndoCommand::undo
-    void undo();
+    void undo() override;
 
     //! Bus owner
     SCgNode *mOwner;

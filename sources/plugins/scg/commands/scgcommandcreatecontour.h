@@ -27,15 +27,15 @@ public:
                                      const QList<QGraphicsItem*> &childs,
                                      const QVector<QPointF> &points,
                                      SCgContour *parentContour,
-                                     QUndoCommand *parent = 0);
+                                     QUndoCommand *parent = nullptr);
     //! Destructor
-    virtual ~SCgCommandCreateContour();
+    ~SCgCommandCreateContour() override;
 
 protected:
     //! @see    QUndoCommand::redo
-    void redo();
+    void redo() override;
     //! @see    QUndoCommand::undo
-    void undo();
+    void undo() override;
 
     //! Contour points
     QVector<QPointF> mPoints;

@@ -13,7 +13,7 @@
 SCgUndoViewModel::SCgUndoViewModel(QObject *parent)
     : QAbstractItemModel(parent)
 {
-    m_stack = 0;
+    m_stack = nullptr;
     m_sel_model = new QItemSelectionModel(this, this);
     connect(m_sel_model, SIGNAL(currentChanged(QModelIndex,QModelIndex)),
             this, SLOT(setStackCurrentIndex(QModelIndex)));
@@ -35,14 +35,14 @@ void SCgUndoViewModel::setStack(QUndoStack *stack)
     if (m_stack == stack)
         return;
 
-    if (m_stack != 0)
+    if (m_stack != nullptr)
     {
         disconnect(m_stack, SIGNAL(cleanChanged(bool)), this, SLOT(stackChanged()));
         disconnect(m_stack, SIGNAL(indexChanged(int)), this, SLOT(stackChanged()));
         disconnect(m_stack, SIGNAL(destroyed(QObject*)), this, SLOT(stackDestroyed(QObject*)));
     }
     m_stack = stack;
-    if (m_stack != 0)
+    if (m_stack != nullptr)
     {
         connect(m_stack, SIGNAL(cleanChanged(bool)), this, SLOT(stackChanged()));
         connect(m_stack, SIGNAL(indexChanged(int)), this, SLOT(stackChanged()));
@@ -56,7 +56,7 @@ void SCgUndoViewModel::stackDestroyed(QObject *obj)
 {
     if (obj != m_stack)
         return;
-    m_stack = 0;
+    m_stack = nullptr;
 
     stackChanged();
 }
@@ -70,7 +70,7 @@ void SCgUndoViewModel::stackChanged()
 
 void SCgUndoViewModel::setStackCurrentIndex(const QModelIndex &index)
 {
-    if (m_stack == 0)
+    if (m_stack == nullptr)
         return;
 
     if (index == selectedIndex())
@@ -84,34 +84,34 @@ void SCgUndoViewModel::setStackCurrentIndex(const QModelIndex &index)
 
 QModelIndex SCgUndoViewModel::selectedIndex() const
 {
-    return m_stack == 0 ? QModelIndex() : createIndex(m_stack->index(), 0);
+    return m_stack == nullptr ? QModelIndex() : createIndex(m_stack->index(), 0);
 }
 
 QModelIndex SCgUndoViewModel::index(int row, int column, const QModelIndex &parent) const
 {
-    if (m_stack == 0)
-        return QModelIndex();
+    if (m_stack == nullptr)
+        return {};
 
     if (parent.isValid())
-        return QModelIndex();
+        return {};
 
     if (column != 0)
-        return QModelIndex();
+        return {};
 
     if (row < 0 || row > m_stack->count())
-        return QModelIndex();
+        return {};
 
     return createIndex(row, column);
 }
 
 QModelIndex SCgUndoViewModel::parent(const QModelIndex&) const
 {
-    return QModelIndex();
+    return {};
 }
 
 int SCgUndoViewModel::rowCount(const QModelIndex &parent) const
 {
-    if (m_stack == 0)
+    if (m_stack == nullptr)
         return 0;
 
     if (parent.isValid())
@@ -128,13 +128,13 @@ int SCgUndoViewModel::columnCount(const QModelIndex&) const
 QVariant SCgUndoViewModel::data(const QModelIndex &index, int role) const
 {
     if (m_stack == 0)
-        return QVariant();
+        return {};
 
     if (index.column() != 0)
-        return QVariant();
+        return {};
 
     if (index.row() < 0 || index.row() > m_stack->count())
-        return QVariant();
+        return {};
 
     if (role == Qt::DisplayRole)
     {
@@ -145,13 +145,13 @@ QVariant SCgUndoViewModel::data(const QModelIndex &index, int role) const
     {
         if (index.row() == m_stack->cleanIndex() && !m_clean_icon.isNull())
             return m_clean_icon;
-        return QVariant();
+        return {};
     } else if (role == Qt::ForegroundRole && selectedIndex().isValid() && selectedIndex().row() < index.row())
     {
         return QBrush(Qt::gray);
     }
 
-    return QVariant();
+    return {};
 }
 
 QString SCgUndoViewModel::emptyLabel() const

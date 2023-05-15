@@ -13,7 +13,7 @@ SCgUndoView::SCgUndoView(QWidget* parent)
     QItemSelectionModel* m = selectionModel();
     QAbstractItemModel* im = model();
 
-    SCgUndoViewModel* newModel = new SCgUndoViewModel(this);
+    auto* newModel = new SCgUndoViewModel(this);
     setModel(newModel);
     setSelectionModel(newModel->selectionModel());
 
@@ -22,13 +22,11 @@ SCgUndoView::SCgUndoView(QWidget* parent)
 }
 
 SCgUndoView::~SCgUndoView()
-{
-
-}
+= default;
 
 void SCgUndoView::setStack(QUndoStack* st)
 {
-    SCgUndoViewModel* vm = dynamic_cast<SCgUndoViewModel*>(model());
+    auto* vm = dynamic_cast<SCgUndoViewModel*>(model());
     Q_ASSERT_X( vm,
                "void ExtendedUndoView::setStack()",
                "Only ExtendedUndoViewModel is supported as model of ExtendedUndoView");

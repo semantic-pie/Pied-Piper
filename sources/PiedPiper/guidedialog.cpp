@@ -8,25 +8,23 @@
 #include "config.h"
 
 #include <QVBoxLayout>
-#include <QHBoxLayout>
 #include <QTextBrowser>
 #include <QCheckBox>
 #include <QSettings>
 #include <QPushButton>
 
 GuideDialog::GuideDialog(QWidget *parent) :
-    QDialog(parent)
-{
-    QVBoxLayout *vlayout = new QVBoxLayout(this);
+        QDialog(parent) {
+    auto *vlayout = new QVBoxLayout(this);
 
-    QTextBrowser *browser = new QTextBrowser(this);
+    auto *browser = new QTextBrowser(this);
     browser->setSource(QUrl("qrc:/media/startup/index.html"));
 
     vlayout->addWidget(browser);
 
-    QHBoxLayout *hlayout = new QHBoxLayout(this);
-    QCheckBox *showCheckBox = new QCheckBox(tr("Show on startup"), this);
-    QPushButton *closeButton = new QPushButton(tr("Close"), this);
+    auto *hlayout = new QHBoxLayout(this);
+    auto *showCheckBox = new QCheckBox(tr("Show on startup"), this);
+    auto *closeButton = new QPushButton(tr("Close"), this);
 
     connect(closeButton, SIGNAL(clicked()), this, SLOT(accept()));
     connect(showCheckBox, SIGNAL(stateChanged(int)), this, SLOT(showStateChanged(int)));
@@ -44,12 +42,9 @@ GuideDialog::GuideDialog(QWidget *parent) :
     setFixedSize(575, 500);
 }
 
-GuideDialog::~GuideDialog()
-{
-}
+GuideDialog::~GuideDialog() = default;
 
-void GuideDialog::showStateChanged(int state)
-{
+void GuideDialog::showStateChanged(int state) {
     QSettings settings;
     settings.setValue(Config::settingsShowStartupDialog, QVariant(state == Qt::Checked));
 }

@@ -24,13 +24,13 @@ SCgCommandCreateContour::SCgCommandCreateContour(SCgScene *scene,
 
 SCgCommandCreateContour::~SCgCommandCreateContour()
 {
-    if (mObject)
+
         delete mObject;
 }
 
 void SCgCommandCreateContour::contourDestroyed()
 {
-    mObject = 0;
+    mObject = nullptr;
 }
 
 void SCgCommandCreateContour::redo()
@@ -62,7 +62,7 @@ void SCgCommandCreateContour::redo()
 
 void SCgCommandCreateContour::undo()
 {
-    Q_ASSERT_X(mObject != 0,
+    Q_ASSERT_X(mObject != nullptr,
                "void SCgCommandCreateContour::undo()",
                "Contour doesn't exists");
 
@@ -78,7 +78,7 @@ void SCgCommandCreateContour::undo()
         item->setParentItem(parent);
     }
 
-    mObject->setParentItem(0);
+    mObject->setParentItem(nullptr);
     mScene->removeItem(mObject);
     mObject->setDead(true);
 

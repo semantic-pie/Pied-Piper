@@ -14,51 +14,43 @@ SCgCommandCreatePair::SCgCommandCreatePair(SCgScene *scene,
                                            SCgObject *endObject,
                                            SCgContour *parentContour,
                                            QUndoCommand *parent)
-    : SCgBaseCommand(scene, 0, parent)
-    , mPoints(points)
-    , mBeginObject(beginObject)
-    , mEndObject(endObject)
-    , mParentContour(parentContour)
-{
+        : SCgBaseCommand(scene, 0, parent), mPoints(points), mBeginObject(beginObject), mEndObject(endObject),
+          mParentContour(parentContour) {
     mObject = mScene->createSCgPair(mBeginObject, mEndObject, mPoints);
 
     connect(mObject, SIGNAL(destroyed()), this, SLOT(pairDestroyed()));
     setText(QObject::tr("Create pair"));
 }
 
-SCgCommandCreatePair::~SCgCommandCreatePair()
-{
-    if(mObject)
-        delete mObject;
+SCgCommandCreatePair::~SCgCommandCreatePair() {
+
+    delete mObject;
 }
 
-void SCgCommandCreatePair::pairDestroyed()
-{
-    mObject = 0;
+void SCgCommandCreatePair::pairDestroyed() {
+    mObject = nullptr;
 }
 
-void SCgCommandCreatePair::redo()
-{
+void SCgCommandCreatePair::redo() {
     Q_ASSERT_X(mObject != 0,
                "void SCgCommandCreatePair::redo()",
                "Pair doesn't exists");
 
     SCgBaseCommand::redo();
 
-    if(mObject->scene() != mScene)
+    if (mObject->scene() != mScene)
         mScene->addItem(mObject);
 
     mObject->setDead(false);
 
-    if(mParentContour)
+    if (mParentContour)
         mObject->setParentItem(mParentContour);
 
     mObject->positionChanged();
 
 }
 
-void SCgCommandCreatePair::undo()
-{
+void SCgCommandCreatePair::undo() {
     Q_ASSERT_X(mObject != 0,
                "void SCgCommandCreatePair::undo()",
                "Pair doesn't exists");

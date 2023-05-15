@@ -16,9 +16,9 @@ class SCgUndoView: public QListView//public QUndoView
     Q_OBJECT
 public:
 
-    SCgUndoView(QWidget* parent = 0);
+    explicit SCgUndoView(QWidget* parent = nullptr);
 
-    virtual ~SCgUndoView();
+    ~SCgUndoView() override;
 
     //! Sets stack as a model of this view.
     void setStack(QUndoStack* st);

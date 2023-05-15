@@ -4,35 +4,28 @@
  * (See accompanying file COPYING.MIT or copy at http://opensource.org/licenses/MIT)
  */
 
-#include "pluginmanager.h"
 #include "config.h"
-#include "platform.h"
 #include "mainwindow.h"
-#include "guidedialog.h"
 
 #include <QApplication>
 #include <QTranslator>
-#include <QLocale>
-#include <QFileInfo>
-#include <QDir>
-#include <QFile>
-#include <QSplashScreen>
-#include <QMessageBox>
-#include <QSettings>
-#include <QDebug>
 
-int main(int argc, char *argv[])
-{
+#include <QDir>
+
+#include <QSettings>
+
+
+int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
 
     // Disable text scaling https://www.charlesodale.com/setting-qt-to-ignore-windows-dpi-text-size-personalization/
     QApplication::setAttribute(Qt::AA_Use96Dpi);
 
-    a.setOrganizationName("Pied Piper");
-    a.setOrganizationDomain("Pied Piper");
-    a.setApplicationName("Pied Piper");
+    QApplication::setOrganizationName("Pied Piper");
+    QApplication::setOrganizationDomain("Pied Piper");
+    QApplication::setApplicationName("Pied Piper");
 
-    a.setAttribute(Qt::AA_DontShowIconsInMenus, false);
+    QApplication::setAttribute(Qt::AA_DontShowIconsInMenus, false);
 
     QDir binPath(QCoreApplication::applicationDirPath());
 
@@ -62,23 +55,22 @@ int main(int argc, char *argv[])
 
     QTranslator myappTranslator;
     myappTranslator.load(":/media/translations/lang_" + QLocale::system().name() + ".qm");
-    a.installTranslator(&myappTranslator);
+    QApplication::installTranslator(&myappTranslator);
 
     //splash.showMessage(a.tr("Create interface"), Qt::AlignBottom | Qt::AlignHCenter);
     MainWindow::getInstance()->show();
 
-    a.processEvents();
+    QApplication::processEvents();
 
-    for(int i = 1; i < argc; i++)
-    {
-        QString arg = a.arguments().at(i);
+    for (int i = 1; i < argc; i++) {
+        QString arg = QApplication::arguments().at(i);
         MainWindow::getInstance()->load(arg);
     }
 
-    QDir dir(QCoreApplication::applicationDirPath( ));
+    QDir dir(QCoreApplication::applicationDirPath());
     dir.mkdir("templates");
     QSettings settings;
-    settings.setValue("templateStorage", dir.absolutePath()+"/templates/");
+    settings.setValue("templateStorage", dir.absolutePath() + "/templates/");
     // check if startup dialog property exist
     if (!settings.contains(Config::settingsShowStartupDialog))
         settings.setValue(Config::settingsShowStartupDialog, QVariant(true));
@@ -93,5 +85,5 @@ int main(int argc, char *argv[])
 //    }
 
     //splash.finish(&w);
-    return a.exec();
+    return QApplication::exec();
 }

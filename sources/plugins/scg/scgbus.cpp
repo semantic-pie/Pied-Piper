@@ -16,8 +16,7 @@
 
 SCgBus::SCgBus() :
         mWidth(5.f),
-        mOwner(0)
-{
+        mOwner(0) {
     mTypeAlias = "bus";
 
     setFlag(QGraphicsItem::ItemIsMovable, true);
@@ -25,37 +24,31 @@ SCgBus::SCgBus() :
     mDefaultZValue = 0;
 }
 
-SCgBus::~SCgBus()
-{
+SCgBus::~SCgBus() {
     //Q_ASSERT(mOwner);   // must be deleted before
-    if (mOwner)
-    {
+    if (mOwner) {
         mOwner->setBus(0);
         mOwner = 0;
     }
 }
 
-QRectF SCgBus::boundingRect() const
-{
+QRectF SCgBus::boundingRect() const {
     return mShape.boundingRect().adjusted(-5, -5, 5, 5);
 }
 
-QPainterPath SCgBus::shape() const
-{
+QPainterPath SCgBus::shape() const {
     return mShape;
 }
 
-void SCgBus::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
+void SCgBus::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     SCgAlphabet::paintBus(painter, this);
 
     SCgObject::paint(painter, option, widget);
 }
 
-QVariant SCgBus::itemChange(GraphicsItemChange change, const QVariant &value)
-{
+QVariant SCgBus::itemChange(GraphicsItemChange change, const QVariant &value) {
     if (change == QGraphicsItem::ItemPositionHasChanged && !mParentChanging
-            && mOwner && !mOwner->isDead())
+        && mOwner && !mOwner->isDead())
         mOwner->setPos(mapToParent(mOwnerPos));
 
     if (change == QGraphicsItem::ItemParentHasChanged && mOwner && !mOwner->isDead())
@@ -64,13 +57,11 @@ QVariant SCgBus::itemChange(GraphicsItemChange change, const QVariant &value)
     return SCgObject::itemChange(change, value);
 }
 
-void SCgBus::positionChanged()
-{
+void SCgBus::positionChanged() {
     // skip update if there are no points
-    if (mPoints.empty())    return;
+    if (mPoints.empty()) return;
 
-    if (mOwner)
-    {
+    if (mOwner) {
         mOwnerPos = mapFromScene(mOwner->scenePos());
         mPoints.first() = mapFromScene(mOwner->cross(mapToScene(mPoints.at(1)), 0.f));
     }
@@ -78,8 +69,7 @@ void SCgBus::positionChanged()
     updateShape();
 }
 
-void SCgBus::updateShape()
-{
+void SCgBus::updateShape() {
     prepareGeometryChange();
 
     // creating shape
@@ -107,32 +97,28 @@ void SCgBus::updateShape()
         mTextItem->setTextPos((mPoints.at(0) + mPoints.at(1)) / 2.f);
 }
 
-void SCgBus::objectDelete(SCgObject *object)
-{
-    Q_UNUSED(object);
+void SCgBus::objectDelete(SCgObject *object) {
+    Q_UNUSED(object)
     if (mOwner)
-        mOwner->setBus(0);
+        mOwner->setBus(nullptr);
 }
 
-void SCgBus::del(QList<SCgObject*> &delList)
-{
-	SCgObject::del(delList);
-	if (mOwner)
-		mOwner->setBus(0);
+void SCgBus::del(QList<SCgObject *> &delList) {
+    SCgObject::del(delList);
+    if (mOwner)
+        mOwner->setBus(nullptr);
 }
 
-void SCgBus::undel(SCgScene *scene)
-{
-	if (mOwner)
-		mOwner->setBus(this);
-	SCgObject::undel(scene);
+void SCgBus::undel(SCgScene *scene) {
+    if (mOwner)
+        mOwner->setBus(this);
+    SCgObject::undel(scene);
 }
 
-QPointF SCgBus::cross(const QPointF &from, float dot) const
-{
+QPointF SCgBus::cross(const QPointF &from, float dot) const {
     Q_UNUSED(from);
     // get sector num
-    int s = (int)dot;
+    int s = (int) dot;
     // get relative pos in sector
     float ds = dot - s;
 
@@ -140,15 +126,14 @@ QPointF SCgBus::cross(const QPointF &from, float dot) const
 
     // calculating position
     if (s >= mPoints.size() - 1)
-        s = mPoints.size() - 2;
+        s = (int) mPoints.size() - 2;
     if (s < 0)
         s = 0;
 
-    return mapToScene(mPoints[s] + (mPoints[s+1] - mPoints[s]) * ds);
+    return mapToScene(mPoints[s] + (mPoints[s + 1] - mPoints[s]) * ds);
 }
 
-float SCgBus::dotPos(const QPointF &point) const
-{
+float SCgBus::dotPos(const QPointF &point) const {
     // get sector with minimal distance to point
     // and calculates relative dot position on it
 
@@ -156,8 +141,7 @@ float SCgBus::dotPos(const QPointF &point) const
     qreal result = 0.f;
     QPointF np = mapFromScene(point);
 
-    for (int i = 1; i < mPoints.size(); i++)
-    {
+    for (int i = 1; i < mPoints.size(); i++) {
         QPointF p1 = mPoints[i - 1];
         QPointF p2 = mPoints[i];
 
@@ -169,8 +153,8 @@ float SCgBus::dotPos(const QPointF &point) const
 
         // calculate point on line
         QVector2D p = QVector2D(p1) + vn * QVector2D::dotProduct(vn, vp);
-        if(v.length() == 0)
-            return result;
+        if (v.length() == 0)
+            return (float) result;
         qreal dotPos = QVector2D(p.toPointF() - p1).length() / v.length();
 
         if (dotPos < 0.f || dotPos > 1.f)
@@ -181,74 +165,64 @@ float SCgBus::dotPos(const QPointF &point) const
         qreal d = QVector2D(np - p.toPointF()).lengthSquared();
 
         // compare with minimum distance
-        if (minDist < 0.f || minDist > d)
-        {
+        if (minDist < 0.f || minDist > d) {
             minDist = d;
             result = (i - 1) + dotPos;
         }
     }
 
-    return result;
+    return (float) result;
 }
 
-SCgPointGraphicsItem* SCgBus::createPointItem(int pointIndex)
-{
-    if(pointIndex == 0)
+SCgPointGraphicsItem *SCgBus::createPointItem(int pointIndex) {
+    if (pointIndex == 0)
         return new SCgIncidentPointGraphicsItem(this, pointIndex);
 
     return new SCgPointGraphicsItem(this, pointIndex);
 }
 
-bool SCgBus::isAcceptable(SCgObject* obj, SCgPointObject::IncidentRole role) const
-{
-    if(obj && obj->type() == SCgNode::Type && role == IncidentBegin)
+bool SCgBus::isAcceptable(SCgObject *obj, SCgPointObject::IncidentRole role) const {
+    if (obj && obj->type() == SCgNode::Type && role == IncidentBegin)
         return true;
     return false;
 }
 
-void SCgBus::changeIncidentObject(SCgObject* obj, const QPointF& point, SCgPointObject::IncidentRole role)
-{
+void SCgBus::changeIncidentObject(SCgObject *obj, const QPointF &point, SCgPointObject::IncidentRole role) {
     Q_UNUSED(point);
     if (isAcceptable(obj, role))
-        setOwner(static_cast<SCgNode*>(obj));
+        setOwner(dynamic_cast<SCgNode *>(obj));
 }
 
-SCgObject* SCgBus::objectWithRole(SCgPointObject::IncidentRole role) const
-{
-    if(role == IncidentBegin)
+SCgObject *SCgBus::objectWithRole(SCgPointObject::IncidentRole role) const {
+    if (role == IncidentBegin)
         return mOwner;
-    return 0;
+    return nullptr;
 }
 
-float SCgBus::getWidth() const
-{
+float SCgBus::getWidth() const {
     return mWidth;
 }
 
-void SCgBus::setOwner(SCgNode *owner)
-{
+void SCgBus::setOwner(SCgNode *owner) {
 
-    if (mOwner)
-    {
+    if (mOwner) {
         mPoints.first() = mapFromScene(mOwner->scenePos());
-        mOwner->setBus(0);
+        mOwner->setBus(nullptr);
     }
     mOwner = owner;
     if (mOwner) mOwner->setBus(this);
     positionChanged();
 }
 
-SCgNode* SCgBus::owner() const
-{
+SCgNode *SCgBus::owner() const {
     return mOwner;
 }
 
-void SCgBus::changePointPosition(int pointIndex, const QPointF& newPos)
-{
+void SCgBus::changePointPosition(int pointIndex, const QPointF &newPos) {
     SCgPointObject::changePointPosition(pointIndex, newPos);
 
-    if(!pointIndex)
+    if (!pointIndex)
         updateShape();
-        else
-            positionChanged();
+    else
+        positionChanged();
 }

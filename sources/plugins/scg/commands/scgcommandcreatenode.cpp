@@ -12,7 +12,7 @@ SCgCommandCreateNode::SCgCommandCreateNode(SCgScene *scene,
                                            const QPointF &point,
                                            SCgContour *parentContour,
                                            QUndoCommand *parent)
-    : SCgBaseCommand(scene, 0, parent)
+    : SCgBaseCommand(scene, nullptr, parent)
     , mPoint(point)
     , mParentContour(parentContour)
 {
@@ -24,22 +24,22 @@ SCgCommandCreateNode::SCgCommandCreateNode(SCgScene *scene,
 
 SCgCommandCreateNode::~SCgCommandCreateNode()
 {
-    if(mObject)
+
         delete mObject;
 }
 
 void SCgCommandCreateNode::nodeDestroyed()
 {
-    mObject = 0;
+    mObject = nullptr;
 }
 
 void SCgCommandCreateNode::undo()
 {
-    Q_ASSERT_X(mObject != 0,
+    Q_ASSERT_X(mObject != nullptr,
                "void SCgCommandCreateNode::undo()",
                "Node doesn't exists");
 
-    mObject->setParentItem(0);
+    mObject->setParentItem(nullptr);
     mScene->removeItem(mObject);
     mObject->setDead(true);
 
@@ -48,7 +48,7 @@ void SCgCommandCreateNode::undo()
 
 void SCgCommandCreateNode::redo()
 {
-    Q_ASSERT_X(mObject != 0,
+    Q_ASSERT_X(mObject != nullptr,
                "void SCgCommandCreateNode::redo()",
                "Node doesn't exists");
 

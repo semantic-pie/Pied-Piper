@@ -23,9 +23,7 @@ SCgBaseCommand::SCgBaseCommand(SCgScene *scene,
 }
 
 SCgBaseCommand::~SCgBaseCommand()
-{
-
-}
+= default;
 
 QGraphicsScene* SCgBaseCommand::getScene() const
 {

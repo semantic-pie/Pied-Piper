@@ -29,8 +29,8 @@ public:
     };
 
 
-    explicit EditorObserverInterface() {}
-    virtual ~EditorObserverInterface() {}
+    explicit EditorObserverInterface() = default;
+    virtual ~EditorObserverInterface() = default;
 
     /*! Notification about observer object change
       * @param editor Pointer to editor interface, that emit event
@@ -47,10 +47,10 @@ public:
 
     explicit EditorInterface() :
         mIsActivated(false),
-        mObserver(0)
+        mObserver(nullptr)
     {
     }
-    virtual ~EditorInterface() {}
+    virtual ~EditorInterface() = default;
 
     //! Return pointer to widget, that represent window
     virtual QWidget* widget() = 0;

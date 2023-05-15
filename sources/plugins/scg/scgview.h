@@ -45,7 +45,7 @@ private:
      * \defgroup menu Actions
      * @{
      */
-    QAction* mActionChangeType;
+    QAction* mActionChangeType{};
     QAction* mActionChangeContent;
     QAction* mActionShowContent;
     QAction* mActionShowAllContent;
@@ -98,7 +98,7 @@ signals:
 public slots:
 
     //! Slot for scale changing. (The string must be smth like this: "123%")
-    void setScale(const QString& sc);
+    [[maybe_unused]] void setScale(const QString& sc);
 
     //! Overloaded function. @p scaleFactor must be in range of 0.1 ... 9.99 .
     void setScale(qreal scaleFactor);

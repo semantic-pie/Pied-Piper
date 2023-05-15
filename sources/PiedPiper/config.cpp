@@ -9,7 +9,7 @@
 
 QDir Config::pathPlugins = QDir("");
 
-const QString Config::settingsApplicationRoot = "/kbe";
+const QString Config::settingsApplicationRoot = "/pied-piper";
 
 const QString Config::settingsRecentFileList = Config::settingsApplicationRoot + "/RecentFileList";
 const QString Config::settingsDocksGeometry = Config::settingsApplicationRoot +"/DockWindowsGeometry";

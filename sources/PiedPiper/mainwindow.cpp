@@ -36,24 +36,19 @@
 #include <QDockWidget>
 #include <QMimeData>
 
-MainWindow* MainWindow::mInstance = 0;
+MainWindow *MainWindow::mInstance = 0;
 
-MainWindow* MainWindow::getInstance()
-{
-    if(!mInstance)
+MainWindow *MainWindow::getInstance() {
+    if (!mInstance)
         mInstance = new MainWindow();
 
     return mInstance;
 }
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
-    , mWindowCounter(0)
-    , mLastActiveWindow(0)
-    , mToolBarFile(0)
-    , mToolBarEdit(0)
-{
+        : QMainWindow(parent), ui(new Ui::MainWindow), mWindowCounter(0), mLastActiveWindow(nullptr),
+          mToolBarFile(nullptr),
+          mToolBarEdit(nullptr) {
     ui->setupUi(this);
 
     mLastDir = QDir(QCoreApplication::applicationDirPath());
@@ -67,8 +62,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(mTabWidget, SIGNAL(currentChanged(int)),
             SLOT(subWindowHasChanged(int)), Qt::AutoConnection);
-    connect(mTabWidget, SIGNAL(tabBeforeClose(QWidget*)),
-            this, SLOT(windowWillBeClosed(QWidget*)));
+    connect(mTabWidget, SIGNAL(tabBeforeClose(QWidget)),
+            this, SLOT(windowWillBeClosed(QWidget)));
+
+
 
     // creating actions
     createActions();
@@ -97,8 +94,7 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 
-MainWindow::~MainWindow()
-{
+MainWindow::~MainWindow() {
     delete mBlurEffect;
     delete mToolBarFile;
     delete mToolBarEdit;
@@ -109,8 +105,7 @@ MainWindow::~MainWindow()
     delete PluginManager::instance();
 }
 
-void MainWindow::createToolBars()
-{
+void MainWindow::createToolBars() {
     mToolBarFile = new QToolBar;
     mToolBarFile->addAction(ui->actionNew);
     mToolBarFile->addAction(ui->actionOpen);
@@ -126,8 +121,7 @@ void MainWindow::createToolBars()
     mToolBarFile->setMovable(false);
 }
 
-void MainWindow::createActions()
-{
+void MainWindow::createActions() {
     ui->actionNew->setIcon(QIcon::fromTheme("document-new", getIcon("document-new.png")));
     ui->actionNew_Project->setIcon(QIcon::fromTheme("document-new", getIcon("document-new.png")));
     ui->actionOpen->setIcon(QIcon::fromTheme("document-open", getIcon("document-open.png")));
@@ -136,7 +130,6 @@ void MainWindow::createActions()
     ui->actionSave_as->setIcon(QIcon::fromTheme("document-save-as", getIcon("document-save-as.png")));
     ui->actionSave_Project->setIcon(QIcon::fromTheme("document-save", getIcon("document-save-as.png")));
     ui->actionExit->setIcon(QIcon::fromTheme("application-exit", getIcon("application-exit.png")));
-
     ui->actionAbout->setIcon(QIcon::fromTheme("help-browser", getIcon("help-browser.png")));
     ui->actionFeedback->setIcon(QIcon::fromTheme("mail", getIcon("mail.png")));
 
@@ -149,12 +142,11 @@ void MainWindow::createActions()
 
     connect(ui->actionSettings, SIGNAL(triggered()), this, SLOT(onViewSettings()));
 
-    for (int i = 0; i < MaxRecentFiles; ++i)
-    {
-        recentFileActs[i] = new QAction(this);
-        recentFileActs[i]->setVisible(false);
-        ui->menuFile->insertAction(ui->actionExit, recentFileActs[i]);
-        connect(recentFileActs[i], SIGNAL(triggered()), this, SLOT(onOpenRecentFile()));
+    for (auto &recentFileAct: recentFileActs) {
+        recentFileAct = new QAction(this);
+        recentFileAct->setVisible(false);
+        ui->menuFile->insertAction(ui->actionExit, recentFileAct);
+        connect(recentFileAct, SIGNAL(triggered()), this, SLOT(onOpenRecentFile()));
     }
     separatorAct = ui->menuFile->insertSeparator(ui->actionExit);
 
@@ -162,72 +154,64 @@ void MainWindow::createActions()
     connect(ui->actionAbout_Qt, SIGNAL(triggered()), this, SLOT(onHelpAboutQt()));
     connect(ui->actionFeedback, SIGNAL(triggered()), this, SLOT(onFeedback()));
     connect(ui->actionGuide, SIGNAL(triggered()), this, SLOT(onGuide()));
-
+    connect(ui->actionExit, &QAction::triggered, this, &MainWindow::close);
     this->addAction(ui->actionExit);
     this->addAction(ui->actionAbout);
 }
 
-void MainWindow::updateEvent(EditorInterface *editor, EditEvents event)
-{
+
+void MainWindow::updateEvent(EditorInterface *editor, EditEvents event) {
     Q_UNUSED(editor);
 
-    switch(event)
-    {
-    case ContentChanged:
-    case ContentLoaded:
-    case ContentSaved:
-        onUpdateMenu();
-        updateWindowTitle();
-        break;
+    switch (event) {
+        case ContentChanged:
+        case ContentLoaded:
+        case ContentSaved:
+            onUpdateMenu();
+            updateWindowTitle();
+            break;
     }
 }
 
-QIcon MainWindow::getIcon(const QString &name) const
-{
+QIcon MainWindow::getIcon(const QString &name) {
     return QIcon(QString(":/media/icons/") + name);
 }
 
-bool MainWindow::checkSubWindowSavedState()
-{
-    QList<QWidget*> list = mTabWidget->subWindowList();
-    QList<QWidget*>::iterator it = list.begin();
-    for(; it != list.end(); it++)
-        if (!qobject_cast<EditorInterface*>(*it)->isSaved())
+bool MainWindow::checkSubWindowSavedState() {
+    QList<QWidget *> list = mTabWidget->subWindowList();
+    QList<QWidget *>::iterator it = list.begin();
+    for (; it != list.end(); it++)
+        if (!qobject_cast<EditorInterface *>(*it)->isSaved())
             return false;
     return true;
 }
 
-EditorInterface *MainWindow::activeChild()
-{
-    if (QWidget *activeSubWindow = mTabWidget->currentWidget())
-    {
+EditorInterface *MainWindow::activeChild() {
+    if (QWidget *activeSubWindow = mTabWidget->currentWidget()) {
         Widget2EditorInterfaceMap::iterator it = mWidget2EditorInterface.find(activeSubWindow);
         if (it != mWidget2EditorInterface.end())
             return *it;
     }
-    return 0;
+    return nullptr;
 }
 
-void MainWindow::onUpdateMenu()
-{
+void MainWindow::onUpdateMenu() {
     EditorInterface *subWindow = activeChild();
 
     ui->actionSave->setEnabled(subWindow && !subWindow->isSaved());
-    ui->actionSave_as->setEnabled(subWindow != 0);
-    ui->actionSave_all->setEnabled(subWindow != 0 && !checkSubWindowSavedState());
+    ui->actionSave_as->setEnabled(subWindow != nullptr);
+    ui->actionSave_all->setEnabled(subWindow != nullptr && !checkSubWindowSavedState());
 
 
 }
 
-void MainWindow::updateRecentFileActions()
-{
+void MainWindow::updateRecentFileActions() {
     QSettings settings;
     QStringList files = settings.value(Config::settingsRecentFileList).toStringList();
 
-    int numRecentFiles = qMin(files.size(), (int)MaxRecentFiles);
+    int numRecentFiles = (int) qMin(files.size(), (int) MaxRecentFiles);
 
-    for (int i = 0; i < numRecentFiles; ++i)
-    {
+    for (int i = 0; i < numRecentFiles; ++i) {
         QString text = tr("&%1 %2").arg(i + 1).arg(QFileInfo(files[i]).fileName());
         recentFileActs[i]->setText(text);
         recentFileActs[i]->setData(files[i]);
@@ -239,29 +223,17 @@ void MainWindow::updateRecentFileActions()
     separatorAct->setVisible(numRecentFiles > 0);
 }
 
-void MainWindow::updateWindowTitle()
-{
-    QWidget *window = mTabWidget->currentWidget();
-
-    if (window != 0)
-    {
-        setWindowTitle(tr("Pied Piper"));
-    }else
-    {
-        setWindowTitle(tr("Pied Piper"));
-    }
+void MainWindow::updateWindowTitle() {
+    setWindowTitle(tr("Pied Piper"));
 }
 
-void MainWindow::onOpenRecentFile()
-{
-    QAction *action = qobject_cast<QAction *>(sender());
-    if (action)
-    {
+void MainWindow::onOpenRecentFile() {
+    auto *action = qobject_cast<QAction *>(sender());
+    if (action) {
         QString fn = action->data().toString();
-        if(QFile::exists(fn))
+        if (QFile::exists(fn))
             load(fn);
-        else
-        {
+        else {
             QSettings settings;
 
             QStringList files = settings.value(Config::settingsRecentFileList).toStringList();
@@ -275,14 +247,13 @@ void MainWindow::onOpenRecentFile()
     }
 }
 
-EditorInterface* MainWindow::createSubWindowByType(const QString& type)
-{
-    EditorInterface* childWindow = 0;
+EditorInterface *MainWindow::createSubWindowByType(const QString &type) {
+    EditorInterface *childWindow = 0;
 
     if (PluginManager::instance()->getEditorFactoriesByType().contains(type))
         childWindow = PluginManager::instance()->createWindowByType(type);
     else
-        return 0;
+        return nullptr;
 
     mWidget2EditorInterface[childWindow->widget()] = childWindow;
     mTabWidget->addSubWindow(childWindow);
@@ -291,14 +262,13 @@ EditorInterface* MainWindow::createSubWindowByType(const QString& type)
     return childWindow;
 }
 
-EditorInterface* MainWindow::createSubWindowByExt(const QString& ext)
-{
-    EditorInterface* childWindow = 0;
+EditorInterface *MainWindow::createSubWindowByExt(const QString &ext) {
+    EditorInterface *childWindow = 0;
 
     if (PluginManager::instance()->getEditorFactoriesByExt().contains(ext))
         childWindow = PluginManager::instance()->createWindowByExt(ext);
     else
-        return 0;
+        return nullptr;
     mWidget2EditorInterface[childWindow->widget()] = childWindow;
     mTabWidget->addSubWindow(childWindow);
     childWindow->_setObserver(this);
@@ -306,16 +276,13 @@ EditorInterface* MainWindow::createSubWindowByExt(const QString& ext)
     return childWindow;
 }
 
-QString MainWindow::getSettingKeyValueForWindow(const QString& editorType) const
-{
+QString MainWindow::getSettingKeyValueForWindow(const QString &editorType) {
     return Config::settingsDocksGeometry + "/" + editorType;
 }
 
-void MainWindow::onFileNew()
-{
-    if (PluginManager::instance()->getEditorFactoriesByType().size() > 0)
-    {
-        NewFileDialog *fileNewDlg = new NewFileDialog(this);
+void MainWindow::onFileNew() {
+    if (!PluginManager::instance()->getEditorFactoriesByType().empty()) {
+        auto *fileNewDlg = new NewFileDialog(this);
 
         int dlgResult = fileNewDlg->exec();
         if (dlgResult == QDialog::Accepted)
@@ -323,10 +290,8 @@ void MainWindow::onFileNew()
     }
 }
 
-void MainWindow::onFileOpen(QString fileName)
-{
-    if (fileName.isNull())
-    {
+void MainWindow::onFileOpen(QString fileName) {
+    if (fileName.isNull()) {
         QFileDialog::Options options;
         options |= QFileDialog::DontUseNativeDialog;
         QString selectedFilter;
@@ -334,18 +299,17 @@ void MainWindow::onFileOpen(QString fileName)
 
         mBlurEffect->setEnabled(true);
         dlg.setDirectory(mLastDir);
-        fileName = dlg.getOpenFileName(this,
-                                       tr("Open file"),
-                                       "",
-                                       PluginManager::instance()->openFilters(),
-                                       &selectedFilter,
-                                       options);
+        fileName = QFileDialog::getOpenFileName(this,
+                                                tr("Open file"),
+                                                "",
+                                                PluginManager::instance()->openFilters(),
+                                                &selectedFilter,
+                                                options);
         mLastDir = QDir(fileName);
         mBlurEffect->setEnabled(false);
     }
 
-    if (!fileName.isEmpty() && QFile::exists(fileName))
-    {
+    if (!fileName.isEmpty() && QFile::exists(fileName)) {
         if (!mTabWidget->activateTab(fileName))
             load(fileName);
         return;
@@ -353,16 +317,13 @@ void MainWindow::onFileOpen(QString fileName)
 
 }
 
-void MainWindow::load(QString fileName)
-{
+void MainWindow::load(const QString &fileName) {
     QFileInfo fi(fileName);
     QString ext = fi.suffix();
-    if(PluginManager::instance()->getSupportedFilesExt().contains(ext))
-    {
-        EditorInterface* childWindow = createSubWindowByExt(ext);
+    if (PluginManager::instance()->getSupportedFilesExt().contains(ext)) {
+        EditorInterface *childWindow = createSubWindowByExt(ext);
 
-        if (childWindow->loadFromFile(fileName))
-        {
+        if (childWindow->loadFromFile(fileName)) {
             QSettings settings;
 
             QStringList files = settings.value(Config::settingsRecentFileList).toStringList();
@@ -380,14 +341,11 @@ void MainWindow::load(QString fileName)
         QMessageBox::warning(this, qAppName(), tr("Can't load file.\nUnsupported file format \"%1\"").arg(ext));
 }
 
-bool MainWindow::saveWindow(EditorInterface* window, QString& name, const QString& ext)
-{
-    if(!name.isEmpty() && window)
-    {
+bool MainWindow::saveWindow(EditorInterface *window, QString &name, const QString &ext) {
+    if (!name.isEmpty() && window) {
         bool retVal = false;
 
-        if(PluginManager::instance()->getSupportedFilesExt().contains(ext))
-        {
+        if (PluginManager::instance()->getSupportedFilesExt().contains(ext)) {
             if (!name.endsWith("." + ext))
                 name += "." + ext;
 
@@ -401,48 +359,44 @@ bool MainWindow::saveWindow(EditorInterface* window, QString& name, const QStrin
     return false;
 }
 
-void MainWindow::onFileSave(QWidget* window)
-{
-    EditorInterface* childWindow = 0;
+void MainWindow::onFileSave(QWidget *window) {
+    EditorInterface *childWindow = nullptr;
 
     Widget2EditorInterfaceMap::iterator it = mWidget2EditorInterface.find(window);
     if (it != mWidget2EditorInterface.end())
         childWindow = *it;
 
-    if(!childWindow)
+    if (!childWindow)
         childWindow = activeChild();
 
     Q_ASSERT(childWindow);
 
-    if (!childWindow->isSaved())
-    {
+    if (!childWindow->isSaved()) {
         QString fileName = childWindow->currentFileName();
-        if(QFile::exists(fileName))
-        {
-            int dPos = fileName.lastIndexOf(".") + 1;
+        if (QFile::exists(fileName)) {
+            int dPos = (int) fileName.lastIndexOf(".") + 1;
             Q_ASSERT_X(dPos != 0, "MainWindow::fileSave()", "File with empty extension!");
             QString ext = fileName.mid(dPos);
             saveWindow(childWindow, fileName, ext);
-        }else
+        } else
             onFileSaveAs(childWindow->widget());
     }
 }
 
-void MainWindow::onFileSaveAs(QWidget* window)
-{
-    EditorInterface* childWindow = 0;
+void MainWindow::onFileSaveAs(QWidget *window) {
+    EditorInterface *childWindow = 0;
     Widget2EditorInterfaceMap::iterator it = mWidget2EditorInterface.find(window);
     if (it != mWidget2EditorInterface.end())
         childWindow = *it;
 
-    if(!childWindow)
+    if (!childWindow)
         childWindow = activeChild();
 
     Q_ASSERT(childWindow);
 
     QString formatsStr = PluginManager::instance()->saveFilters(childWindow->supportedFormatsExt());
     QFileDialog::Options options;
-    options |= QFileDialog::DontUseNativeDialog ;
+    options |= QFileDialog::DontUseNativeDialog;
 
 
     QString selectedFilter;
@@ -455,13 +409,12 @@ void MainWindow::onFileSaveAs(QWidget* window)
                                             &selectedFilter,
                                             options);
     mLastDir = QDir(fileName);
-    if(!fileName.isEmpty())
-    {
+    if (!fileName.isEmpty()) {
         //! TODO: use regular expression
-        int pos = selectedFilter.indexOf("*.");
+        int pos = (int) selectedFilter.indexOf("*.");
         Q_ASSERT_X(pos != -1, "MainWindow::fileSaveAs", "Can't find begin of extension");
         pos += 2;
-        int pos2 = selectedFilter.indexOf(")", pos);
+        int pos2 = (int) selectedFilter.indexOf(")", pos);
         Q_ASSERT_X(pos2 != -1, "MainWindow::fileSaveAs", "Can't find end of extension");
         saveWindow(childWindow, fileName, selectedFilter.mid(pos, pos2 - pos).trimmed());
     }
@@ -470,29 +423,24 @@ void MainWindow::onFileSaveAs(QWidget* window)
 
 }
 
-void MainWindow::onFileSaveAll()
-{
+void MainWindow::onFileSaveAll() {
 
 }
 
-void MainWindow::onFileExportToImage()
-{
+void MainWindow::onFileExportToImage() {
 
 }
 
-void MainWindow::onFileExit()
-{
+void MainWindow::onFileExit() {
     close();
 }
 
-void MainWindow::onViewSettings()
-{
+void MainWindow::onViewSettings() {
     Q_ASSERT(mSettingsDialog);
     mSettingsDialog->show();
 }
 
-void MainWindow::onHelpAbout()
-{
+void MainWindow::onHelpAbout() {
     QMessageBox::about(this, tr("About Pied Piper"),
                        tr("<table><tr valign=\"middle\"><td align=\"left\"><img src=\"%1\"></td>"
                           "<td>%2 %3: %4 <br> <br> Site: "
@@ -520,16 +468,15 @@ void MainWindow::onHelpAbout()
                           "<li>Pavel Karpan (pioneer)</li>"
                           "</ul>"
                           "</td></tr></table>")
-                       .arg(QString(":/media/icons/pied.png"))
-                       .arg(tr("Pied Piper"))
-                       .arg(tr("version"))
-                       .arg(VERSION.toString())
-                       .arg(tr("Authors"))
-                       .arg(tr("Contributors")));
+                               .arg(QString(":/media/icons/pied.png"))
+                               .arg(tr("Pied Piper"))
+                               .arg(tr("version"))
+                               .arg(VERSION.toString())
+                               .arg(tr("Authors"))
+                               .arg(tr("Contributors")));
 }
 
-void MainWindow::onHelpAboutQt()
-{
+void MainWindow::onHelpAboutQt() {
     QMessageBox::about(this, tr("About Pied Piper"),
                        tr("<table><tr valign=\"middle\"><td align=\"left\"><img src=\"%1\"></td>"
                           "<td>%2 %3: %4 <br> <br> Site: "
@@ -557,95 +504,81 @@ void MainWindow::onHelpAboutQt()
                           "<li>Pavel Karpan (pioneer)</li>"
                           "</ul>"
                           "</td></tr></table>")
-                       .arg(QString(":/media/icons/pied.png"))
-                       .arg(tr("Pied Piper "))
-                       .arg(tr("version"))
-                       .arg(VERSION.toString())
-                       .arg(tr("Authors"))
-                       .arg(tr("Contributors")));
+                               .arg(QString(":/media/icons/pied.png"))
+                               .arg(tr("Pied Piper "))
+                               .arg(tr("version"))
+                               .arg(VERSION.toString())
+                               .arg(tr("Authors"))
+                               .arg(tr("Contributors")));
 }
 
-void MainWindow::onFeedback()
-{
+void MainWindow::onFeedback() {
     QMessageBox::about(this, tr("Feedback"),
                        QString("%1 <a href=\"https://sem.systems\">%2</a>."
                                "<br/>%3 <a href=\"%4\">%5</a>.")
-                       .arg(tr("Founded errors and new ideas you can send to developers on"))
-                       .arg(tr("site"))
-                       .arg(tr("Also you can find our contact information on "))
-                       .arg("https://sem.systems/#contacts")
-                       .arg(tr("here")));
+                               .arg(tr("Founded errors and new ideas you can send to developers on"))
+                               .arg(tr("site"))
+                               .arg(tr("Also you can find our contact information on "))
+                               .arg("https://sem.systems/#contacts")
+                               .arg(tr("here")));
 }
 
-void MainWindow::onGuide()
-{
+void MainWindow::onGuide() {
     GuideDialog dlg;
     dlg.exec();
 }
 
-void MainWindow::changeEvent(QEvent *event)
-{
+void MainWindow::changeEvent(QEvent *event) {
     QMainWindow::changeEvent(event);
-    switch (event->type())
-    {
-    case QEvent::LanguageChange:
-        ui->retranslateUi(this);
-        break;
-    default:
-        break;
+    switch (event->type()) {
+        case QEvent::LanguageChange:
+            ui->retranslateUi(this);
+            break;
+        default:
+            break;
     }
 }
 
-void MainWindow::showEvent(QShowEvent *event)
-{
+void MainWindow::showEvent(QShowEvent *event) {
     Q_UNUSED(event);
 }
 
-void MainWindow::updateDockWidgets(bool visible)
-{
+void MainWindow::updateDockWidgets(bool visible) {
     Q_ASSERT_X(mLastActiveWindow,
                "void MainWindow::updateDockWidgets(bool hide)",
                "window must be activated first!");
 
     QString windowClassName = mLastActiveWindow->widget()->metaObject()->className();
-    if(!visible)
-    {
+    if (!visible) {
         mStates[windowClassName] = saveState();
-        QMap<QString, QDockWidget*>::const_iterator it = mDockWidgets.begin();
-        while(it != mDockWidgets.end())
-        {
+        QMap<QString, QDockWidget *>::const_iterator it = mDockWidgets.begin();
+        while (it != mDockWidgets.end()) {
             it.value()->close();
             ++it;
         }
-    }else
-    {
-        foreach(QWidget* w, mLastActiveWindow->widgetsForDocks())
-        {
-            if(!mDockWidgets.contains(w->objectName()))
-            {
-                QDockWidget* d = new QDockWidget(w->windowTitle(), this);
-                mDockWidgets[w->objectName()] = d;
-                d->setObjectName(w->objectName());
-            }
-            mDockWidgets[w->objectName()]->setWidget(w);
+    } else {
+                foreach(QWidget *w, mLastActiveWindow->widgetsForDocks()) {
+                if (!mDockWidgets.contains(w->objectName())) {
+                    QDockWidget *d = new QDockWidget(w->windowTitle(), this);
+                    mDockWidgets[w->objectName()] = d;
+                    d->setObjectName(w->objectName());
+                }
+                mDockWidgets[w->objectName()]->setWidget(w);
                 addDockWidget(Qt::RightDockWidgetArea, mDockWidgets[w->objectName()]);
-        }
+            }
     }
 }
 
-void MainWindow::subWindowHasChanged(int index)
-{
-    if (mLastActiveWindow)
-    {
+void MainWindow::subWindowHasChanged(int index) {
+    if (mLastActiveWindow) {
         mLastActiveWindow->deactivate(this);
         updateDockWidgets(false);
     }
 
     mLastActiveWindow = 0;
 
-    QWidget* window = mTabWidget->widget(index);
-    if (window)
-    {
+    QWidget *window = mTabWidget->widget(index);
+    if (window) {
         Q_ASSERT(mWidget2EditorInterface.contains(window));
 
         mLastActiveWindow = mWidget2EditorInterface[window];
@@ -659,36 +592,34 @@ void MainWindow::subWindowHasChanged(int index)
     updateWindowTitle();
 }
 
-bool MainWindow::windowWillBeClosed(QWidget* w)
-{
-    QMap<QWidget*, EditorInterface*>::iterator it = mWidget2EditorInterface.find(w);
+bool MainWindow::windowWillBeClosed(QWidget *w) {
+    QMap<QWidget *, EditorInterface *>::iterator it = mWidget2EditorInterface.find(w);
 
 
-    Q_ASSERT_X( it != mWidget2EditorInterface.end(),
+    Q_ASSERT_X(it != mWidget2EditorInterface.end(),
                "void MainWindow::windowWillBeClosed(QWidget *w)",
                "There are no conversion to editor interface for a given window");
 
-    it.value()->_setObserver(0);
+    it.value()->_setObserver(nullptr);
 
     // check if it saved
     EditorInterface *editor = it.value();
-    if (!editor->isSaved())
-    {
+    if (!editor->isSaved()) {
         QString fileName = editor->currentFileName();
 
-        if(fileName.isEmpty())
+        if (fileName.isEmpty())
             //: Appers after 'Do you want to save changes in '
             fileName = tr("newly created document");
 
         int question = QMessageBox::question(this, tr("Save changes"),
                                              tr("Do you want to save changes in %1 ?").arg(fileName),
-                                             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes);
+                                             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                                             QMessageBox::Yes);
 
-        if (question == QMessageBox::Yes)
-        {
+        if (question == QMessageBox::Yes) {
             onFileSave(it.key());
         }
-        if(question == QMessageBox::Cancel){
+        if (question == QMessageBox::Cancel) {
             return false;
         }
     }
@@ -697,8 +628,7 @@ bool MainWindow::windowWillBeClosed(QWidget* w)
     return true;
 }
 
-void MainWindow::saveLayout() const
-{
+void MainWindow::saveLayout() const {
     QSettings settings;
 
     // Save window geometry (width, height) and layout
@@ -706,52 +636,49 @@ void MainWindow::saveLayout() const
 
     // Save layouts for all used editor types.
     QMap<QString, QByteArray>::const_iterator i;
-    for(i = mStates.constBegin(); i != mStates.constEnd() ; i++)
-    {
+    for (i = mStates.constBegin(); i != mStates.constEnd(); i++) {
         settings.setValue(getSettingKeyValueForWindow(i.key()), i.value());
     }
 }
 
-void MainWindow::closeEvent(QCloseEvent *event)
-{  
+void MainWindow::closeEvent(QCloseEvent *event) {
     // close all child windows
-    QList<QWidget*> widgets = mWidget2EditorInterface.keys();
-    QWidget *widget = 0;
-    foreach (widget, widgets)
-    {
-        if(!mTabWidget->onCloseWindow(widget))
-        {
-            event->ignore();
-            return;
+    QList<QWidget *> widgets = mWidget2EditorInterface.keys();
+    if(!widgets.empty()) {
+        for(auto i: widgets){
+            windowWillBeClosed(i);
         }
     }
+        QWidget *widget;
+                foreach (widget, widgets) {
+                if (!mTabWidget->onCloseWindow(widget)) {
+                    event->ignore();
+                    return;
+                }
+            }
 
-    saveLayout();
+        saveLayout();
+
 }
 
-void MainWindow::dragEnterEvent(QDragEnterEvent *event)
-{
+void MainWindow::dragEnterEvent(QDragEnterEvent *event) {
     event->acceptProposedAction();
 }
 
-void MainWindow::dragMoveEvent(QDragMoveEvent *event)
-{
+void MainWindow::dragMoveEvent(QDragMoveEvent *event) {
     event->acceptProposedAction();
 }
 
-void MainWindow::dragLeaveEvent(QDragLeaveEvent *event)
-{
+void MainWindow::dragLeaveEvent(QDragLeaveEvent *event) {
     event->accept();
 }
 
-void MainWindow::dropEvent(QDropEvent *event)
-{
+void MainWindow::dropEvent(QDropEvent *event) {
     QList<QUrl> urls = event->mimeData()->urls();
     QList<QUrl>::iterator it = urls.begin();
-    for(; it != urls.end(); it++)
-    {
+    for (; it != urls.end(); it++) {
         QString fileName = it->toLocalFile();
-        if(QFile::exists(fileName))
+        if (QFile::exists(fileName))
             load(fileName);
     }
     event->acceptProposedAction();

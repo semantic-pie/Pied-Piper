@@ -27,19 +27,17 @@ SCgCommandChangeIncedentObject::SCgCommandChangeIncedentObject(SCgScene* scene,
 }
 
 SCgCommandChangeIncedentObject::~SCgCommandChangeIncedentObject()
-{
-
-}
+= default;
 
 void SCgCommandChangeIncedentObject::redo()
 {
-    static_cast<SCgPointObject*>(mObject)->changeIncidentObject(mNewObject, mNewPoint, mRole);
+    dynamic_cast<SCgPointObject*>(mObject)->changeIncidentObject(mNewObject, mNewPoint, mRole);
     SCgBaseCommand::redo();
 }
 
 void SCgCommandChangeIncedentObject::undo()
 {
     SCgBaseCommand::undo();
-    static_cast<SCgPointObject*>(mObject)->changeIncidentObject(mOldObject, mOldPoint, mRole);
+    dynamic_cast<SCgPointObject*>(mObject)->changeIncidentObject(mOldObject, mOldPoint, mRole);
 }
 
