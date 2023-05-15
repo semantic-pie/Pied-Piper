@@ -16,6 +16,7 @@
 #include <QHBoxLayout>
 #include <QGridLayout>
 #include <QLabel>
+#include<QDebug>
 
 SCgContentChangeDialog* SCgContentChangeDialog::mInstance = 0;
 
@@ -36,12 +37,13 @@ SCgContentChangeDialog::SCgContentChangeDialog(SCgNode *node, QWidget *parent) :
 
     QHBoxLayout *topLayout = new QHBoxLayout;
     QComboBox *comboFormats = new QComboBox(this);
-    connect(comboFormats, SIGNAL(currentIndexChanged(QString)), this, SLOT(changeFromat(QString)));
+    connect(comboFormats, &QComboBox::currentTextChanged, this, &SCgContentChangeDialog::changeFromat);
+
     topLayout->addWidget(comboFormats, 0, Qt::AlignLeft);
 
     QHBoxLayout *bottomLayout = new QHBoxLayout;
 
-    mButtonApply = new QPushButton(tr("Apply"), this);
+    mButtonApply = new QPushButton(tr("apply"), this);
     connect(mButtonApply, SIGNAL(clicked()), this, SLOT(apply()));
     bottomLayout->addWidget(mButtonApply, 1, Qt::AlignRight);
 
@@ -75,6 +77,7 @@ SCgContentChangeDialog::~SCgContentChangeDialog()
 
 void SCgContentChangeDialog::changeFromat(QString format)
 {
+
     if (mDialog)
     {
         delete mDialog;

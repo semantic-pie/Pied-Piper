@@ -19,7 +19,7 @@
 #include <QSplashScreen>
 #include <QMessageBox>
 #include <QSettings>
-
+#include <QDebug>
 
 int main(int argc, char *argv[])
 {
@@ -75,7 +75,10 @@ int main(int argc, char *argv[])
         MainWindow::getInstance()->load(arg);
     }
 
+    QDir dir(QCoreApplication::applicationDirPath( ));
+    dir.mkdir("templates");
     QSettings settings;
+    settings.setValue("templateStorage", dir.absolutePath()+"/templates/");
     // check if startup dialog property exist
     if (!settings.contains(Config::settingsShowStartupDialog))
         settings.setValue(Config::settingsShowStartupDialog, QVariant(true));

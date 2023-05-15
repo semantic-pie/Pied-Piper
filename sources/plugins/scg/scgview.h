@@ -51,6 +51,7 @@ private:
     QAction* mActionShowAllContent;
     QAction* mActionHideAllContent;
     QAction* mActionDeleteContent;
+    QAction* mActionSaveTemp;
     QAction* mActionChangeIdtf;
     QAction* mActionDelete;
     QAction* mActionContourDelete;
@@ -114,6 +115,8 @@ private slots:
 
     //! Swap sc.g-pair orientation
     void swapPairOrient();
+
+     void showSaveTempDialog();
 
     //! Start dialog for sc.g-element identifier changing
     void changeIdentifier();

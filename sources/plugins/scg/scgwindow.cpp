@@ -19,7 +19,13 @@
 #include <QMenuBar>
 #include <QMenu>
 #include <QToolButton>
+#include <QTimer>
+#include <QDialogButtonBox>
+#include <QLabel>
 #include <QFileDialog>
+#include <QDebug>
+#include <QDialog>
+#include <QSettings>
 #include "scglayoutmanager.h"
 #include "arrangers/scgarrangervertical.h"
 #include "arrangers/scgarrangerhorizontal.h"
@@ -172,6 +178,7 @@ void SCgWindow::createToolBar()
     action->setCheckable(true);
     action->setChecked(true);
     action->setShortcut(QKeySequence(tr("1", "Selection mode")));
+    action->setToolTip("<html><body><img src=\"https://i.gifer.com/LRP3.gif\"></body></html>");
     group->addAction(action);
     mToolBar->addAction(action);
     mMode2Action[SCgScene::Mode_Select] = action;
@@ -275,9 +282,9 @@ void SCgWindow::createToolBar()
     //BluePrint button
     action = new QAction(findIcon("tool-blueprint.png"), tr("BluePrints"), mToolBar);
     action->setCheckable(false);
-    action->setShortcut(QKeySequence(tr("0", "BluePrints")));
+    group->addAction(action);
     mToolBar->addAction(action);
-    connect(action, SIGNAL(triggered()), this, SLOT(onBluePrint()));
+    connect(action, SIGNAL(triggered()), this, SLOT(onTemplateTool()));
     mToolBar->addSeparator();
 
     //Zoom in
@@ -419,6 +426,107 @@ void SCgWindow::onSelectSubgraph()
 {
     SCgSelectSubGraph select;
     select.doSelection(mScene);
+}
+
+bool SCgWindow::saveTempToFile(const QString &fileName)
+{
+    GWFFileWriter writer;
+
+    if (writer.saveTemp(fileName, mView->scene()->selectedItems()))
+    {
+        return true;
+    }else
+        return false;
+}
+
+void SCgWindow::onTemplateTool()
+{
+    QSettings set;
+    QDir dir = QDir(set.value("templateStorage").toString());
+    QStringList allFiles = dir.entryList(QStringList()<<"*.gwf");
+    QDialog dialog(this);
+    dialog.setWindowTitle(tr("Create template"));
+    QComboBox* list = new QComboBox();
+
+    QLabel* label = new QLabel(tr("Choose template"));
+
+    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
+                                                       | QDialogButtonBox::Cancel);
+
+    connect(buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
+    connect(buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addWidget(label);
+    layout->addWidget(list);
+    layout->addWidget(buttonBox);
+    dialog.setLayout(layout);
+    list->addItems(allFiles);
+    if(dialog.exec() == QDialog::Accepted)
+    {
+        SCgScene* scene = new SCgScene(new QUndoStack(this), this);
+        GWFFileLoader loader;
+        loader.load(set.value("templateStorage").toString()+list->currentText(), scene);
+        QList<QString> listIdtf;
+        foreach(QGraphicsItem* item, scene->items())
+            if(SCgObject::isSCgObjectType(item->type()))
+            {
+                if(static_cast <SCgObject*> (item)->typeAlias().split('/').contains("var"))
+                {
+                    listIdtf<<static_cast <SCgObject*> (item)->idtfValue();
+                    static_cast <SCgObject*> (item)->positionChanged();
+
+                }
+            }
+        QDialog dialogCreate(this);
+        dialogCreate.setWindowTitle(tr("Create fragment"));
+        QDialogButtonBox* bttnBox = new QDialogButtonBox(QDialogButtonBox::Ok
+                                                         | QDialogButtonBox::Cancel);
+
+        connect(bttnBox, SIGNAL(accepted()), &dialogCreate, SLOT(accept()));
+        connect(bttnBox, SIGNAL(rejected()), &dialogCreate, SLOT(reject()));
+        QVBoxLayout* mainLay = new QVBoxLayout();
+        QVBoxLayout* fields = new QVBoxLayout();
+        QList<QLineEdit*> newIdtf;
+        foreach(QString idtf, listIdtf)
+        {
+            QHBoxLayout* row = new QHBoxLayout();
+            QLabel* var = new QLabel(idtf);
+            QLineEdit* lineEdit = new QLineEdit();
+            row->addWidget(var);
+            row->addWidget(lineEdit);
+            fields->addLayout(row);
+            newIdtf<<lineEdit;
+        }
+        mainLay->addLayout(fields);
+        mainLay->addWidget(bttnBox);
+        dialogCreate.setLayout(mainLay);
+        if(dialogCreate.exec() == QDialog::Accepted){
+            for(int i =0;i<newIdtf.size();i++){
+                foreach(QGraphicsItem* item, scene->items()){
+                    if(SCgObject::isSCgObjectType(item->type())){
+                        if(static_cast<SCgObject*>(item)->idtfValue() == listIdtf[i]){
+                            scene->changeIdtfCommand(static_cast<SCgObject*>(item), newIdtf[i]->text());
+                            QList<QString> type = static_cast<SCgObject*>(item)->typeAlias().split('/');
+                            type.replace(type.indexOf("var"), "const");
+                            QString newType="";
+                            foreach(QString t, type)
+                                newType += t + "/";
+                            newType.chop(1);
+                            static_cast<SCgObject*>(item)->setTypeAlias(newType);
+                        }
+                    }
+
+                }
+            }
+            foreach(QGraphicsItem* item, scene->items()){
+                if(SCgObject::isSCgObjectType(item->type())){
+                    item->setSelected(true);
+                    mView->scene()->addItem(item);
+                }
+            }
+        }
+    }
 }
 
 void SCgWindow::onExportImage()

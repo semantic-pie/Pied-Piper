@@ -1,4 +1,5 @@
 QT += xml widgets concurrent
+
 TARGET        = $$qtLibraryTarget(scg)
 TEMPLATE      = lib
 INCLUDEPATH  += ../../PiedPiper \

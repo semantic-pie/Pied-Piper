@@ -27,6 +27,7 @@
 #include <QUndoStack>
 #include <QCompleter>
 #include <QFileInfo>
+#include<QSettings>
 
 SCgView::SCgView(QWidget *parent, SCgWindow *window) :
     QGraphicsView(parent),
@@ -43,6 +44,7 @@ SCgView::SCgView(QWidget *parent, SCgWindow *window) :
     mActionCut(0),
     mActionPaste(0),
     mActionSelectAll(0),
+    mActionSaveTemp(0),
     mContextMenu(0),
     mContextObject(0),
     mWindow(window),
@@ -71,6 +73,10 @@ void SCgView::createActions()
     QAction* sep = new QAction(this);
     sep->setSeparator(true);
     mActionsList.append(sep);
+
+    mActionSaveTemp = new QAction(tr("Save as template"), mWindow);
+    mWindow->addAction(mActionSaveTemp);
+    connect(mActionSaveTemp, SIGNAL(triggered(bool)), this, SLOT(showSaveTempDialog()));
 
     mActionChangeType = new QAction(tr("Select type"), mWindow);
     mActionChangeType->setShortcut(QKeySequence( tr("T") ));
@@ -145,7 +151,7 @@ void SCgView::createActions()
     mActionsList.append(mActionShowAllContent);
     mActionsList.append(mActionHideAllContent);
     mActionsList.append(mActionDeleteContent);
-
+    mActionsList.append(mActionSaveTemp);
     sep = new QAction(this);
     sep->setSeparator(true);
     mActionsList.append(sep);
@@ -240,6 +246,7 @@ void SCgView::updateActionsState(int idx)
     mActionDelete->setEnabled(isAnySelected);
     mActionCut->setEnabled(isAnySelected);
     mActionCopy->setEnabled(isAnySelected);
+    mActionSaveTemp->setEnabled(isAnySelected);
 
     //check for showed/hidden contents
     items = scene()->items();
@@ -423,6 +430,36 @@ void SCgView::changeIdentifier()
             static_cast<SCgScene*>(scene())->changeIdtfCommand(mContextObject, newIdtf);
     }
 }
+
+
+void SCgView::showSaveTempDialog()
+{
+    QDialog dialog(this);
+    dialog.setWindowTitle(tr("Save template"));
+    QLineEdit* lineEdit = new QLineEdit(&dialog);
+    QLabel* label = new QLabel(tr("File name:"),&dialog);
+
+    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
+                                                       | QDialogButtonBox::Cancel);
+    buttonBox->setParent(&dialog);
+
+    connect(buttonBox, SIGNAL(accepted()), &dialog, SLOT(accept()));
+    connect(buttonBox, SIGNAL(rejected()), &dialog, SLOT(reject()));
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addWidget(label);
+    layout->addWidget(lineEdit);
+    layout->addWidget(buttonBox);
+    dialog.setLayout(layout);
+    QSettings set;
+    QString fileName ;
+    if(dialog.exec() == QDialog::Accepted)
+    {
+        fileName = set.value("templateStorage").toString() + lineEdit->text() + ".gwf";
+        mWindow->saveTempToFile(fileName);
+    }
+}
+
 
 void SCgView::showTypeDialog()
 {

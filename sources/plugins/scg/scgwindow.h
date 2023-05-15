@@ -11,6 +11,7 @@
 
 #include <QToolBox>
 #include <QMap>
+#include <QComboBox>
 
 class SCgMinimap;
 class SCgView;
@@ -43,6 +44,8 @@ public:
 
     //! @copydoc EditorInterface::saveToFile
     bool saveToFile(const QString &fileName);
+
+    bool saveTempToFile(const QString &fileName);
 
     /*! Update window immediately
       */
@@ -191,6 +194,8 @@ private slots:
     void onZoomOut();
     //! Slot to set zoom factor value.
     void onViewScaleChanged(qreal newScaleValue);
+
+    void onTemplateTool();
 
     //! Handle find next button pressed event
     void findNext();
