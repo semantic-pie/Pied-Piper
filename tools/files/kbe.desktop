@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Version=1.0
-Name=KBE
-GenericName=Knowledge Base Source Editor
-Icon=kbe
-Exec=kbe
-Terminal=false
-Categories=Education;Science;ArtificialIntelligence;Qt;
