@@ -47,14 +47,6 @@ lrelease.CONFIG       += no_link target_predeps
 QMAKE_EXTRA_COMPILERS += lrelease
 
 RC_FILE = kbe.rc
-#Debug:DEFINES += _DEBUG
 
 OBJECTS_DIR = obj
 MOC_DIR = moc
-
-OTHER_FILES += \
-    media/stylesheets/projectmanager.qssRC_ICONS
-RC_ICONS = kbe.icns
-
-DISTFILES += \
-    all.icns
