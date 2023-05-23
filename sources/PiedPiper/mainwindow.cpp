@@ -135,8 +135,9 @@ void MainWindow::createActions()
     ui->actionSave->setIcon(QIcon::fromTheme("document-save", getIcon("document-save.png")));
     ui->actionSave_as->setIcon(QIcon::fromTheme("document-save-as", getIcon("document-save-as.png")));
     ui->actionSave_Project->setIcon(QIcon::fromTheme("document-save", getIcon("document-save-as.png")));
+#ifdef TARGET_OS_WIN32
     ui->actionExit->setIcon(QIcon::fromTheme("application-exit", getIcon("application-exit.png")));
-
+#endif
     ui->actionAbout->setIcon(QIcon::fromTheme("help-browser", getIcon("help-browser.png")));
     ui->actionFeedback->setIcon(QIcon::fromTheme("mail", getIcon("mail.png")));
 
