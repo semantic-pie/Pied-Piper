@@ -391,6 +391,12 @@ SCgBaseCommand* SCgScene::changeIdtfCommand(SCgObject *object, const QString &id
                 splittedAlias[3] = alphabet.aliasFromStructCode(SCgAlphabet::StructType_Relation);
                 typeChanged = true;
             }
+
+            //structure
+            if(idtf.startsWith("concept")){
+                splittedAlias[3] = alphabet.aliasFromStructCode(SCgAlphabet::StructType_Group);
+                typeChanged = true;
+            }
         }
 
         // if type changed, then make new type alias and setup it to object
