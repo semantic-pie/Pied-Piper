@@ -379,14 +379,14 @@ SCgBaseCommand* SCgScene::changeIdtfCommand(SCgObject *object, const QString &id
         if (object->type() == SCgNode::Type)
         {
             // role relation
-            if (idtf.endsWith('\''))
+            if (idtf.endsWith('\'') || idtf.startsWith("rrel"))
             {
                 splittedAlias[3] = alphabet.aliasFromStructCode(SCgAlphabet::StructType_Role);
                 typeChanged = true;
             }
 
             // binary relation
-            if (idtf.endsWith('*'))
+            if (idtf.endsWith('*') || idtf.startsWith("nrel"))
             {
                 splittedAlias[3] = alphabet.aliasFromStructCode(SCgAlphabet::StructType_Relation);
                 typeChanged = true;
