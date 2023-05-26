@@ -15,7 +15,7 @@ SettingsDialog::SettingsDialog(QWidget * parent)
     : QDialog(parent)
     , mGeneralTab(0)
 {
-    setWindowTitle(tr("Какие-то там настройки, блять"));
+    setWindowTitle(tr("Settings"));
 
     mTabWidget = new QTabWidget();
     mTabWidget->setMinimumWidth(800);
@@ -45,7 +45,7 @@ void SettingsDialog::createGeneralTab()
 void SettingsDialog::initialize()
 {
     createGeneralTab();
-    mTabWidget->addTab(mGeneralTab, tr("Главная хуйня"));
+    mTabWidget->addTab(mGeneralTab, tr("General"));
 
     PluginManager::tSettingWidgetsMap const & widgets = PluginManager::instance()->getSettingWidgets();
     PluginManager::tSettingWidgetsMap::const_iterator it = widgets.begin();
