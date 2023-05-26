@@ -16,6 +16,7 @@
 #include <QDialogButtonBox>
 #include <QAction>
 #include <QShortcut>
+#include <QGuiApplication>
 
 SCgTypeSelectionDialog::SCgTypeSelectionDialog(int objectType, QWidget* parent)
     : QDialog(parent)
@@ -206,8 +207,10 @@ void SCgTypeSelectionDialog::displayTypes()
 
 void SCgTypeSelectionDialog::addTypeButton(const QIcon& icon, const QString& text, int hotkey, QWidget* parent)
 {
-    QPushButton* button = new QPushButton(icon, text);
-    button->setIconSize(QSize(72, 24));
+    auto* button = new QPushButton(icon, text);
+    QSize size = this->size();
+    button->setMaximumSize(size.width()/4, size.height()/15);
+    button->setIconSize(QSize(36, 24));
     button->setToolTip(QString::number(hotkey));
     connect(button, SIGNAL(clicked(bool)), this, SLOT(onChooseType()));
 
@@ -216,7 +219,7 @@ void SCgTypeSelectionDialog::addTypeButton(const QIcon& icon, const QString& tex
     else
         return;
 
-    QShortcut* shortcut = new QShortcut(parent);
+    auto* shortcut = new QShortcut(parent);
     shortcut->setKey(QString::number(hotkey));
     shortcut->setContext(Qt::WidgetWithChildrenShortcut);
     connect(shortcut, SIGNAL(activated()), button, SLOT(click()));

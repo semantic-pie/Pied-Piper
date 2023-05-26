@@ -19,7 +19,6 @@ win32 {
 }
 
 HEADERS += \
-    BluePrints.h \
     scgwindow.h \
     scgview.h \
     scgtemplateobjectbuilder.h \
@@ -99,7 +98,6 @@ HEADERS += \
     scgtypedialog.h
 
 SOURCES += \
-    BluePrints.cpp \
     scgwindow.cpp \
     scgview.cpp \
     scgtemplateobjectbuilder.cpp \

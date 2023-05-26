@@ -37,7 +37,6 @@
 
 #include "scgplugin.h"
 #include "scgexportimage.h"
-#include "BluePrints.h"
 #include "scgfindwidget.h"
 #include "scgview.h"
 #include "scgminimap.h"
@@ -178,7 +177,7 @@ void SCgWindow::createToolBar()
     action->setCheckable(true);
     action->setChecked(true);
     action->setShortcut(QKeySequence(tr("1", "Selection mode")));
-    action->setToolTip("<html><body><img src=\"https://i.gifer.com/LRP3.gif\"></body></html>");
+    action->setToolTip("<img src=\"https://i.gifer.com/LRP3.gif\">");
     group->addAction(action);
     mToolBar->addAction(action);
     mMode2Action[SCgScene::Mode_Select] = action;
