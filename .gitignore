@@ -11,8 +11,6 @@ sources/kbe/ui_mainwindow.h
 installer/sources/*
 *bin
 *qrc_*.cpp
-.DS_Store
-sources/.DS_Store
-sources/kbe/.DS_Store
+*.DS_Store
 *moc
 *obj
