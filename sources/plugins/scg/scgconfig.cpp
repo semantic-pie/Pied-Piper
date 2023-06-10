@@ -51,7 +51,7 @@ void SCgConfig::initializeDefault()
 {
     // --- elements ---
     scg_cfg_set_default_value_color(scg_key_element_color_normal, QColor(0, 0, 0));
-    scg_cfg_set_default_value_color(scg_key_element_color_selected, QColor(0, 193, 43));
+    scg_cfg_set_default_value_color(scg_key_element_color_selected, QColor(0, 193, 127));  //select node color
     scg_cfg_set_default_value_color(scg_key_element_color_highlight, QColor(255, 124, 0));
 
     scg_cfg_set_default_value_color(scg_text_element_color_normal, QColor(0, 64, 164));

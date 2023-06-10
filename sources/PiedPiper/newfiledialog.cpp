@@ -45,7 +45,7 @@ NewFileDialog::NewFileDialog(QWidget *parent) :
 
     QPushButton *butCancel = new QPushButton(tr("Cancel"));
 
-    buttonLay->addWidget(butOk, 1, Qt::AlignRight);
+    buttonLay->addWidget(butOk, 3, Qt::AlignRight);
     buttonLay->addWidget(butCancel, 1, Qt::AlignRight);
 
     lay->addWidget(lab);
@@ -64,5 +64,10 @@ NewFileDialog::~NewFileDialog()
 
 QString NewFileDialog::selectedEditor() const
 {
+  if (mAvailableTypesList->selectedItems().isEmpty()) {
+    // No item is selected, return an empty string or handle the error appropriately
+    return QString();
+  } else {
     return mAvailableTypesList->selectedItems().at(0)->data(EditorTypeRole).toString();
+  }
 }
