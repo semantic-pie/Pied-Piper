@@ -215,6 +215,7 @@ void SCgWindow::createToolBar()
 
     // align group button
     QToolButton *alignButton = new QToolButton(mToolBar);
+    alignButton->setStyleSheet("QToolButton { margin-left: 17px; } ");
     alignButton->setIcon(findIcon("tool-align.png"));
     alignButton->setPopupMode(QToolButton::InstantPopup);
     alignButton->setToolTip(tr("Alignment"));
@@ -250,6 +251,7 @@ void SCgWindow::createToolBar()
 
     // selection group button
     QToolButton *selectButton = new QToolButton(mToolBar);
+    selectButton->setStyleSheet("QToolButton { margin-left: 17px; margin-top: 8px; } ");
     selectButton->setIcon(findIcon("tool-select-group.png"));
     selectButton->setPopupMode(QToolButton::InstantPopup);
     selectButton->setToolTip(tr("Selection group"));
