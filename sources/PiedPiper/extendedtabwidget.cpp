@@ -17,13 +17,30 @@ ExtendedTabWidget::ExtendedTabWidget(QWidget *parent) :
     QTabWidget(parent)
 {
     QTabBar* tb = new QTabBar(this);
+    tb->setStyleSheet("QTabBar::tab:selected {background-color: qlineargradient(spread:pad, x1:0.511, y1:0, x2:0.511, y2:1, stop:0 #2dc48f ,stop:0.995192 #20ae7c);"
+                      "color: #ffffff;"
+                      "font-weight: normal;"
+                      "padding-top: 1px;"
+                      "padding-bottom: 2px;"
+                      "border: none;"
+                      "border-radius: 6px;"
+                      "min-width: 130px;"
+                      "font: 14pt Helvetica Neue;}"
+                      "QTabBar::tab:!selected {"
+                      "background-color: rgb(248, 248, 248);"
+                      "color: #000000;"
+                      "font-weight: normal;"
+                      "border: none;"
+                      "border-radius: 6px;"
+                      "min-width: 130px;"
+                      "font: 14pt Helvetica Neue;}");
     tb->setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
     setTabBar(tb);
     setMovable(true);
     setTabPosition(QTabWidget::North);
     setTabShape(QTabWidget::Rounded);
     setTabsClosable(true);
-    setIconSize(QSize(32, 32));
+    setIconSize(QSize(23, 23));
 
     connect(this, SIGNAL(tabCloseRequested(int)), this, SLOT(onClose(int)));
 }
@@ -67,10 +84,13 @@ QString ExtendedTabWidget::tabTextFor(QWidget* subWindow)
     if (n != -1)
         title = title.mid(n + 1);
 
-//    if (subWindow->isWindowModified())
-//        title += " [*]";
+    if (subWindow->isWindowModified()) {
+      printf("hello");
+      title += " [*]";
+    }
 
-    return title.isEmpty() ? tr("(Untitled)") : title;
+
+    return title.isEmpty() ? tr("Untitled") : title;
 }
 
 bool ExtendedTabWidget::onCloseWindow(QWidget* wnd)
@@ -155,7 +175,7 @@ int ExtendedTabWidget::addSubWindow(EditorInterface* window)
     Q_ASSERT(widget != 0);
 
     int curr = currentIndex();
-    int index = QTabWidget::insertTab(curr + 1, widget, window->icon(), tabTextFor(widget));
+    int index = QTabWidget::insertTab(curr + 1, widget, tabTextFor(widget));
     widget->installEventFilter(this);
     widget->setAttribute(Qt::WA_DeleteOnClose, true);
     setCurrentWidget(widget);
